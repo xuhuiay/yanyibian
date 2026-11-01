@@ -5,6 +5,7 @@
 use tauri::{Manager, WebviewUrl, WebviewWindowBuilder};
 
 pub mod ai;
+pub mod api;
 pub mod commands;
 pub mod core_ffi;
 pub mod docx;

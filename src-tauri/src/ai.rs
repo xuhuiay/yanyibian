@@ -160,6 +160,69 @@ pub fn ai_set_config(config: AiConfig, api_key: Option<String>) -> Result<serde_
     Ok(config_view())
 }
 
+/// 供对外 API（`yyb-api`）复用：与 `ai_revise` 完全同一条链路
+/// （内核校验 → 取缺陷 → 模型给最小改动 → 本地守卫 → 内核复检）。
+pub fn revise_points_blocking(text: &str, template_id: &str) -> Result<serde_json::Value, String> {
+    revise_blocking(text.to_string(), template_id.to_string())
+}
+
+/// 供对外 API 读取运行期配置快照（不含 Key 本身，只回 hasKey）。
+pub fn config_snapshot() -> serde_json::Value {
+    config_view()
+}
+
+/// 供对外 API 从环境变量装配配置。Key 只写入进程内存，调用方不得把它落盘。
+pub fn configure_runtime(
+    provider: Option<String>,
+    base_url: Option<String>,
+    model: Option<String>,
+    api_key: Option<String>,
+    timeout_ms: Option<u64>,
+    max_retry: Option<u8>,
+    allow_fact_edit: Option<bool>,
+) -> Result<serde_json::Value, String> {
+    let mut c = cfg_lock().lock().unwrap().clone();
+    if let Some(p) = provider {
+        if !p.is_empty() {
+            c.provider = p;
+        }
+    }
+    if let Some(b) = base_url {
+        if !b.is_empty() {
+            c.base_url = b;
+        }
+    }
+    if let Some(m) = model {
+        if !m.is_empty() {
+            c.model = m;
+        }
+    }
+    if let Some(t) = timeout_ms {
+        c.timeout_ms = t;
+    }
+    if let Some(r) = max_retry {
+        c.max_retry = r;
+    }
+    if let Some(f) = allow_fact_edit {
+        c.allow_fact_edit = f;
+    }
+    c.enabled = true;
+    validate(&c)?;
+    if let Some(k) = api_key {
+        let mut slot = key_lock().lock().unwrap();
+        if k.is_empty() {
+            *slot = None;
+        } else {
+            *slot = Some(k);
+        }
+    }
+    if key_lock().lock().unwrap().is_none() {
+        return Err(String::from("E_AI_NO_KEY: 启用前请先填写 API Key"));
+    }
+    *cfg_lock().lock().unwrap() = c;
+    Ok(config_view())
+}
+
 #[tauri::command]
 pub fn ai_cancel() -> bool {
     cancel_flag().store(true, Ordering::SeqCst);

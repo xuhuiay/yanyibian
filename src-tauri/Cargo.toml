@@ -17,6 +17,10 @@ path = "src/main.rs"
 name = "yyb-check"
 path = "src/bin/yyb_check.rs"
 
+[[bin]]
+name = "yyb-api"
+path = "src/bin/yyb_api.rs"
+
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 cc = "1"

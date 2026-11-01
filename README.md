@@ -45,6 +45,11 @@ src-tauri\target\release\yanyibian.exe
 :: 3. 命令行（无窗口，适合 CI / 自检 / 排障）
 src-tauri\target\release\yyb-check.exe --version
 src-tauri\target\release\yyb-check.exe weekly 周报.txt
+
+:: 4. 对外 HTTP 接口（给外部程序调用，见 docs/api.md）
+set YYB_API_TOKEN=tok-abc
+src-tauri\target\release\yyb-api.exe
+:: GET /v1/health  POST /v1/points  →  points[] / review / verdict
 ```
 
 打安装包（NSIS，装到用户目录、免管理员）：
@@ -81,7 +86,7 @@ src-tauri/   Tauri 2 壳
 shell/       最小壳页（index.html + app.js + style.css，零框架、零打包器）
 tools/       parity 差分门禁（含 spec/yanyibian.js）、ai-mock、图标生成
 scripts/     build-windows / build-bundle / test-windows / verify-all
-docs/        introduction / template-agent-command / build-and-run / parity / ai-api-rules
+docs/        introduction / template-agent-command / build-and-run / parity / ai-api-rules / api
 ```
 
 ## 文档
@@ -93,6 +98,7 @@ docs/        introduction / template-agent-command / build-and-run / parity / ai
 | [docs/parity.md](docs/parity.md) | 判定口径逐条实现细节与 593 例门禁 |
 | [docs/template-agent-command.md](docs/template-agent-command.md) | 第 5 套模板 `agentcmd`（Agent 命令验收）：五区块骨架、判定映射、范例、实施清单 |
 | [docs/ai-api-rules.md](docs/ai-api-rules.md) | AI 通道的权限范围、鉴权、配额、错误码、隐私 |
+| [docs/api.md](docs/api.md) | 对外 HTTP 接口 `yyb-api`：`GET /v1/health`、`POST /v1/points`、字段语义、错误码、调用示例 |
 
 ## 关于本仓库
 

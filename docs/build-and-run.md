@@ -1,7 +1,7 @@
 # 验一遍 YanYiBian · 构建与运行说明（v1.4 / 2026-11-01）
 
 > 对应方案文档：`（方案文档，未随本仓库分发；待补充：公开地址）`（v1.4，见其 §7 / §8 / §9 / §10）。
-> 本文只讲「怎么构建、怎么跑、跑到什么程度」；判定口径见 `docs/parity.md`，外部 AI 通道的规则与验收见 `docs/ai-api-rules.md`。
+> 本文只讲「怎么构建、怎么跑、跑到什么程度」；判定口径见 `docs/parity.md`，外部 AI 通道的规则与验收见 `docs/ai-api-rules.md`，对外 HTTP 接口见 `docs/api.md`（v1.9 新增）。
 
 ## 1. 这是什么
 
@@ -211,6 +211,28 @@ docx 走 `src-tauri/src/docx.rs`：只读 `word/document.xml`，每个 `<w:p>` �
 
 **判定口径未变**：壳页只调用命令，不实现任何判定；随机示例、AI 面板都不影响 `check_text` 的结果。门禁仍是 `tools/parity` 的逐键比对（v1.8：593 例，RULE_VERSION=yyb-4）。
 
+### 5.8 对外 HTTP 接口 yyb-api（v1.9）
+
+同一个 Cargo 包的第三个可执行文件，给**外部程序**调用：`src-tauri/src/bin/yyb_api.rs` + `src-tauri/src/api.rs`（手写 HTTP/1.1，无新依赖）。它不建窗口、不碰 WebView2，可在无桌面会话里跑。
+
+```bat
+set YYB_API_TOKEN=tok-abc
+set YYB_AI_KEY=test-key
+set YYB_AI_BASE=http://127.0.0.1:8799/v1
+set YYB_AI_MODEL=mock-model
+src-tauri\target\release\yyb-api.exe
+```
+
+| 端点 | 说明 |
+|---|---|
+| `GET /v1/health` | 探活 + `ruleVersion` / AI 配置快照（不含 Key）/ 上限 |
+| `POST /v1/points` | `{text, templateId, includeRules, maxPoints}` → `points[]`（`source=ai\|rule`）+ `review` + `verdict` |
+
+- 复用关系：规则判定仍走 `core_ffi::check`；模型改写走 `ai::revise_points_blocking` → `revise_blocking`，与壳页「AI 修改」同一条链路（同提示词、同守卫、同重试），**没有第二套实现**。
+- 安全：Key 只从环境变量进进程内存；无 token 且未显式 `YYB_API_ALLOW_ANON=1` 时**拒绝启动**；默认只监听 `127.0.0.1:8788`；无请求日志。
+- 边界：明文 HTTP、`connection: close`、需 `Content-Length`（不支持 chunked）、请求体 ≤ 512 KB、正文 ≤ 20,000 码元、默认限流 30 次/分钟（全局单桶）。
+- 完整字段说明、错误码表、请求响应示例、待裁定项：`docs/api.md`。
+
 ## 6. 验收
 
 ### 6.1 一条命令跑全套
@@ -223,7 +245,7 @@ scripts\verify-all.bat
 |---|---|---|
 | 1/4 | `rulemeta.mjs` + `gen-corpus.mjs` | 生成 `build/corpus.jsonl` 与 `build/rulemeta.json` |
 | 2/4 | `build-cli.bat` + `gen-golden.mjs` + `run-parity.mjs` | `[parity] PASS 593/593 一致（RULE_VERSION=yyb-4）` |
-| 3/4 | `build-windows.bat` | 两个 exe 落地 |
+| 3/4 | `build-windows.bat` | 三个 exe 落地（`yanyibian` / `yyb-check` / `yyb-api`） |
 | 4/4 | `yyb-check --version` + `yyb-check weekly tools\parity\fixtures\smoke-weekly.txt` | 版本 `yyb-4`；`chars 78` / `defects 3` / `passes 5` |
 
 末行出现 `ALL CHECKS PASSED` 即全绿。
@@ -233,7 +255,7 @@ scripts\verify-all.bat
 | 项 | 结果 |
 |---|---|
 | 差分门禁 | `PASS 593/593`（`RULE_VERSION=yyb-4`） |
-| 构建 | 首次 1m 06s；改源码后 1m 18s；无改动 0.36s。**v1.4**：`yanyibian.exe` **7,714,304 B**（加 reqwest/native-tls 共 +914 KB）、`yyb-check.exe` 691,200 B；v1.3 为 6,800,384 B |
+| 构建 | 首次 1m 06s；改源码后 1m 18s；无改动 0.36s。**v1.9**：`yanyibian.exe` **7,717,888 B**、`yyb-check.exe` **697,856 B**、`yyb-api.exe` **1,632,256 B**（v1.4 时 `yanyibian.exe` 7,714,304 B、`yyb-check.exe` 691,200 B；v1.3 为 6,800,384 B） |
 | FFI 冒烟 | `yyb-check weekly tools\parity\fixtures\smoke-weekly.txt` → 3 条缺陷（缺「风险」/ 套话「赋能」/ 量化断言 2 处）、5 项通过 |
 | GUI 实测 | 通过 WebView2 远程调试（CDP）驱动真实窗口，结论「不建议直接交付」、缺陷 3 条、通过项 5 条，与 CLI/JS 逐字一致 |
 | Web 页 | `验一遍/check.html` 截图核对：徽章 `yyb-2`，结论/缺陷/通过项/原文高亮与桌面端一致 |
