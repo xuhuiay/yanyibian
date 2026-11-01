@@ -52,7 +52,7 @@
 | `general` | 通用交付 | 不确定归类时的兜底：只查长度/语气/套话/结构 | 600 | 2 | 1 | —（不查要素） | 赋能、闭环、抓手、颠覆、革命性…（7） |
 | `agentcmd` | Agent 命令验收 | 交给 Agent 执行的命令：区块齐全、边界清楚、可验收 | 1200 | 5 | 0 | 角色、背景、步骤、约束与边界、验收标准 | 尽量、大概、差不多、酌情…（8，模糊词） |
 
-> `agentcmd` 是 v1.7 新增的第 5 套模板（`RULE_VERSION` 随之升到 `yyb-3`），五个区块即五个必需要素，缺一个就是一条 `high`，标签直接写区块名（例如「缺「步骤」」）。详见 [template-agent-command.md](template-agent-command.md)。
+> `agentcmd` 是 v1.7 新增的第 5 套模板（`RULE_VERSION` 随之升到 `yyb-3`），五个区块即五个必需要素，缺一个就是一条 `high`，标签直接写区块名（例如「缺「步骤」」）。v1.8 起长度上限由 1200 调整为 20000 字（与输入硬上限一致），版本升到 `yyb-4`；每套模板的示例补到 3 条，壳页「随机示例」每次抽一条且不连抽同一条。详见 [template-agent-command.md](template-agent-command.md)。
 >
 > 注意：模板的"字数上限"是**判定规则**，不是输入框的软提示。超过就产生一条 `mid` 缺陷，结论因此落到"建议改一遍再交"。
 > 与输入层 20,000 码元的**硬上限**是两件事：后者只决定"能不能提交校验"，前者决定"合不合格"。
@@ -74,7 +74,7 @@
 与图形界面共用同一个内核绑定层，无窗口也能跑，用于 CI、装机自检、排查"是界面还是内核的问题"。
 
 ```bat
-yyb-check --version                     :: 打印规则版本，如 yyb-3
+yyb-check --version                     :: 打印规则版本，如 yyb-4
 yyb-check --templates                   :: 五套模板的完整阈值与词表（JSON）
 yyb-check --samples                     :: 内置示例文本（JSON）
 yyb-check weekly 周报.txt                :: 校验单个文件，每文件一行 JSON
@@ -103,7 +103,7 @@ yyb-check --dump x.docx                 :: 排障：只打印读入层抽出的�
 
 | 命令 | 作用 |
 |---|---|
-| `api_version` | 规则版本（`yyb-3`） |
+| `api_version` | 规则版本（`yyb-4`） |
 | `list_templates` / `list_samples` | 模板阈值与词表 / 内置示例 |
 | `check_text(text, templateId)` | 粘贴文本校验 |
 | `load_text_file(path)` | 读入单个文件（自动识别编码、支持 .docx） |
@@ -151,7 +151,7 @@ yyb-check --dump x.docx                 :: 排障：只打印读入层抽出的�
 - **Rust 层只做 IO 与整形**：解码、docx 解包、上限、批量、对话框、报告落盘；不参与判定。
 - **同进程调用而非 sidecar**：无额外进程、无端口、无额外防火墙/杀软摩擦，启动即可用。
 
-**一致性是门禁，不是承诺**：仓库里同时存放规格副本（`tools/parity/spec/yanyibian.js`，Web 端原始实现）与 C++ 实现，`tools/parity` 用固定种子生成 **538 条语料**（五模板示例、8 种空白形态、长度边界、要素正则扫描、禁用词/感叹号/段落/量化短语、代理对/BOM/零宽/U+2028、220 条随机文本），逐键 deep-equal 比对，要求 **100% 全绿**；规则改动必须同时改两处并递增 `RULE_VERSION`（当前 `yyb-3`）。**回归一旦不一致，构建门禁直接失败。**
+**一致性是门禁，不是承诺**：仓库里同时存放规格副本（`tools/parity/spec/yanyibian.js`，Web 端原始实现）与 C++ 实现，`tools/parity` 用固定种子生成 **593 条语料**（五模板示例、8 种空白形态、长度边界、要素正则扫描、禁用词/感叹号/段落/量化短语、代理对/BOM/零宽/U+2028、220 条随机文本），逐键 deep-equal 比对，要求 **100% 全绿**；规则改动必须同时改两处并递增 `RULE_VERSION`（当前 `yyb-4`）。**回归一旦不一致，构建门禁直接失败。**
 
 ## 8. 明确的边界
 
@@ -212,10 +212,10 @@ yyb-check --dump x.docx                 :: 排障：只打印读入层抽出的�
 |---|---|
 | `README.md` | 仓库定位、结构与最短上手 |
 | `docs/build-and-run.md` | 构建、运行、打包、安装、排障、发布清单 |
-| `docs/parity.md` | 判定口径逐条实现细节与 538 例门禁 |
+| `docs/parity.md` | 判定口径逐条实现细节与 593 例门禁 |
 | `docs/template-agent-command.md` | `agentcmd` 模板正文：五区块骨架、必填项、判定映射、范例 |
 | `docs/ai-api-rules.md` | AI 通道的权限范围、鉴权、配额、错误码、隐私 |
 
 ---
 
-**规则版本**：`yyb-3`（改规则须同时改 C++ 内核与 `tools/parity/spec/yanyibian.js`，并递增版本号）。
+**规则版本**：`yyb-4`（改规则须同时改 C++ 内核与 `tools/parity/spec/yanyibian.js`，并递增版本号）。

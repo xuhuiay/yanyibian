@@ -6,7 +6,7 @@
 ## 1. 这是什么
 
 `yanyibian-app` 是「验一遍」的独立桌面客户端：**C++17 规则内核（静态库，同进程）+ Tauri 2 壳 + 零框架静态前端**。
-判定只有一份实现，且与 Web 端 `tools/parity/spec/yanyibian.js` **逐键等价**（由 538 例差分门禁强制）。
+判定只有一份实现，且与 Web 端 `tools/parity/spec/yanyibian.js` **逐键等价**（由 593 例差分门禁强制）。
 
 版本说明：程序版本仍是 **0.1.0**（安装包名不变）；v1.4 在同一版本号下加了「单份上限收紧到 20000 码元」与「可选外部 AI 通道（代号 v0.2）」。
 
@@ -35,7 +35,7 @@ yanyibian-app/
 │  ├─ include/yyb/yyb.h        对外 C ABI（唯一头文件）
 │  ├─ src/yyb_text.{h,cpp}     UTF-8 ⇄ UTF-16 码元、空白判定（与 JS \s 同集）
 │  ├─ src/yyb_pattern.{h,cpp}  MiniRE：按码元匹配的 ECMAScript 子集正则
-│  ├─ src/yyb_templates.cpp    5 套模板 + 4 条示例（逐字段照 yanyibian.js）
+│  ├─ src/yyb_templates.cpp    5 套模板 + 15 条示例（逐字段照 yanyibian.js）
 │  ├─ src/yyb_engine.cpp       六类检查 / 结论 / 排序 / 区间
 │  ├─ src/yyb_capi.cpp         C ABI 实现 + 固定键序 JSON 序列化
 │  ├─ cli/main.cpp             yyb-cli：控制台门禁入口（支持 --tab 十六进制通道）
@@ -57,7 +57,7 @@ yanyibian-app/
 │  ├─ styles.css               纸面墨色主题（系统字体栈，零外联）
 │  └─ app.js                   invoke 调用、渲染、标红、导出报告
 ├─ tools/
-│  ├─ parity/gen-corpus.mjs    生成 538 例语料（固定种子 20261101）
+│  ├─ parity/gen-corpus.mjs    生成 593 例语料（固定种子 20261101）
 │  ├─ parity/gen-golden.mjs    用 JS 真源算期望值 → build/golden.jsonl
 │  ├─ parity/rulemeta.mjs      导出 RULE_VERSION → build/rulemeta.json
 │  ├─ parity/run-parity.mjs    逐键 deepEqual，先校验版本戳
@@ -163,16 +163,18 @@ docx 走 `src-tauri/src/docx.rs`：只读 `word/document.xml`，每个 `<w:p>` �
 
 ### 5.5 外部 AI 通道（可选，v0.2）
 
-默认**关闭**，关闭时不联网、不读 Key。开启：顶栏「设置」→「AI 修改」卡片 → 勾「启用外部 AI」→ 服务商（OpenAI / DeepSeek / 自定义）→ 接口地址 → 模型 → API Key → 「保存设置」→「← 返回校验」，在单篇页「AI 修改」面板点「让 AI 生成修改稿」。v1.5 起全部配置项都在 `#view-settings`。
+默认**关闭**，关闭时不联网、不读 Key。v1.8 起由仓库自带的壳页提供入口：`shell/index.html` 页面下方「AI 修改（可选）」区块 → 勾「启用」→ 服务商（OpenAI / DeepSeek / 自定义）→ 接口地址 → 模型 → API Key → 「保存设置」→「生成修改稿」。
+
+> v1.8 说明：v1.5 的独立设置页与 `localStorage` 持久化随 `ui/` 一并移除。壳页恢复的是四个 AI 命令（`ai_get_config` / `ai_set_config` / `ai_cancel` / `ai_revise`）的**调用入口**；配置与 Key 只存在进程内存，重启需重填。
 
 - 协议：OpenAI 兼容 `POST {base_url}/chat/completions`；必须 `https`（`localhost` / `127.0.0.1` / `::1` 允许 `http`，供本地网关自测）。
-- Key：后端只在内存、不回传前端；v1.5 起前端把它写进 `localStorage["yyb.ai.cfg.v1"]`（WebView2 数据目录，**明文**），重启自动回填，`enabled` 不落盘；「清除已保存的 Key」可删。加密（待补充：DPAPI / Keystore）。
+- Key：只在后端进程内存（`Mutex<Option<String>>`），不回传前端、不写 `localStorage`、不落盘；「清除 Key」即刻清空，重启即失效。若要恢复本机持久化，必须用 DPAPI / Keystore 加密（**待补充：Q-33**）。
 - 发送内容：正文 + 模板 ID + 缺陷清单（等级/标签/类型/解释/命中片段）；**不发**文件名、路径、历史。
-- 流程：内核校验 → 取缺陷（无缺陷不调用）→ AI 给最小改动 → 本地守卫（数字/唯一性/长度/重叠）→ 内核复检 → 界面显示「复检对比 / 逐处修改 / 需人工处理」→ 可「应用到编辑器」或「导出交付包（修改稿 + 变更说明 + 复检结果）」。
+- 流程：内核校验 → 取缺陷（无缺陷不调用）→ AI 给最小改动 → 本地守卫（数字/唯一性/长度/重叠）→ 内核复检 → 界面显示「复检对比 / 逐处修改 / 需人工处理」→ 可「应用到编辑器」（写回 textarea 并立即重校验）或「复制交付包」（修改稿 + 变更说明 + 复检结果，只写剪贴板）。
 - 失败与重试：超时默认 20000 ms（3000–120000 可调）；仅 429/5xx/网络错误重试（默认 1 次）；4xx 不重试；「取消」= 结果返回后丢弃。
 - 错误码、隐私、逐条验收见 `docs/ai-api-rules.md`。
 
-自测：`node tools/ai-mock/server.mjs 8799` 起一个假服务（Key `test-key`），再用 `node tools/ai-mock/drive.mjs 9340 8799` 走完 19 步验收。
+自测：`node tools/ai-mock/server.mjs` 起一个假 OpenAI 兼容服务（`127.0.0.1:8799`，Key `test-key`；支持 `MOCK_MODE=ok|fact|dup|nothing|badjson|e400|e500|slow|cancel`，`GET /__stats` 看调用记录）。壳页里把服务商选「自定义」、接口地址填 `http://127.0.0.1:8799/v1`、模型填 `mock-model`、Key 填 `test-key`，保存后点「生成修改稿」即可离线验证整条链路。
 
 ### 5.6 字数上限：一个阈值，五处生效（v1.6）
 
@@ -199,6 +201,16 @@ docx 走 `src-tauri/src/docx.rs`：只读 `word/document.xml`，每个 `<w:p>` �
 
 **未改的一项（需产品裁定）**：模板自身的 `maxChars`（周报 300 / 通知 200 / 项目说明 500 / 通用 600）是**判定规则**，超了只出一条 `mid`「长度」缺陷，不拦提交。若希望长文档不再因长度被提示，需要新增模板或提高 `maxChars`——那会改动 `core/` 与 `tools/parity` 的 493 例语料并升 `RULE_VERSION`，本次未动（见方案 §12.4）。
 
+### 5.7 壳页：随机示例与命令入口（v1.8）
+
+`shell/` 是仓库自带的最小壳页，用于端到端验证「C++ 内核 → C ABI → Tauri 命令 → 界面」整条链路，不是完整产品界面。
+
+**随机示例**：内置示例（`SAMPLES`，规格真源 `tools/parity/spec/yanyibian.js`）共 **15 条，每套模板 3 条**。点「随机示例」会从当前模板的示例里随机抽一条填入，并提示「已随机填入示例：<标题>（共 3 条，再点一次换一条）」；连续两次不会抽到同一条（`state.lastSample` 记上次索引）。示例同时通过 `list_samples` 暴露，C++ 侧 `yyb_list_samples_json` 返回同一份文案。
+
+**命令入口**：壳页覆盖 13 个 Tauri 命令中的使用侧 7 个 —— `api_version` / `limits_info` / `list_templates` / `list_samples` / `check_text` / `load_text_file`（经「打开文件…」）/ `pick_text_files`；批量与导出（`check_files` / `save_report`）以及 AI 四个命令在 CLI 或集成方调用（AI 已在 §5.5 接回壳页）。
+
+**判定口径未变**：壳页只调用命令，不实现任何判定；随机示例、AI 面板都不影响 `check_text` 的结果。门禁仍是 `tools/parity` 的逐键比对（v1.8：593 例，RULE_VERSION=yyb-4）。
+
 ## 6. 验收
 
 ### 6.1 一条命令跑全套
@@ -210,9 +222,9 @@ scripts\verify-all.bat
 | 步骤 | 内容 | 通过标志 |
 |---|---|---|
 | 1/4 | `rulemeta.mjs` + `gen-corpus.mjs` | 生成 `build/corpus.jsonl` 与 `build/rulemeta.json` |
-| 2/4 | `build-cli.bat` + `gen-golden.mjs` + `run-parity.mjs` | `[parity] PASS 538/538 一致（RULE_VERSION=yyb-3）` |
+| 2/4 | `build-cli.bat` + `gen-golden.mjs` + `run-parity.mjs` | `[parity] PASS 593/593 一致（RULE_VERSION=yyb-4）` |
 | 3/4 | `build-windows.bat` | 两个 exe 落地 |
-| 4/4 | `yyb-check --version` + `yyb-check weekly tools\parity\fixtures\smoke-weekly.txt` | 版本 `yyb-3`；`chars 78` / `defects 3` / `passes 5` |
+| 4/4 | `yyb-check --version` + `yyb-check weekly tools\parity\fixtures\smoke-weekly.txt` | 版本 `yyb-4`；`chars 78` / `defects 3` / `passes 5` |
 
 末行出现 `ALL CHECKS PASSED` 即全绿。
 
@@ -220,7 +232,7 @@ scripts\verify-all.bat
 
 | 项 | 结果 |
 |---|---|
-| 差分门禁 | `PASS 538/538`（`RULE_VERSION=yyb-3`） |
+| 差分门禁 | `PASS 593/593`（`RULE_VERSION=yyb-4`） |
 | 构建 | 首次 1m 06s；改源码后 1m 18s；无改动 0.36s。**v1.4**：`yanyibian.exe` **7,714,304 B**（加 reqwest/native-tls 共 +914 KB）、`yyb-check.exe` 691,200 B；v1.3 为 6,800,384 B |
 | FFI 冒烟 | `yyb-check weekly tools\parity\fixtures\smoke-weekly.txt` → 3 条缺陷（缺「风险」/ 套话「赋能」/ 量化断言 2 处）、5 项通过 |
 | GUI 实测 | 通过 WebView2 远程调试（CDP）驱动真实窗口，结论「不建议直接交付」、缺陷 3 条、通过项 5 条，与 CLI/JS 逐字一致 |
@@ -286,7 +298,7 @@ start "" "%LOCALAPPDATA%\YanYiBian\yanyibian.exe"
 
 | 层 | 内容 |
 |---|---|
-| 内核 | 六类检查（长度/要素覆盖/禁用项/语气/格式/事实一致性）、三档结论、缺陷稳定排序 + 解释、定位区间去重叠、通过项、5 套模板、4 条示例；空文本（含纯空白）判单条 `high`「全文为空」（`type=格式`，`start=-1`）并跳过其余检查；前端不前置拦截，照常展示内核结论 |
+| 内核 | 六类检查（长度/要素覆盖/禁用项/语气/格式/事实一致性）、三档结论、缺陷稳定排序 + 解释、定位区间去重叠、通过项、5 套模板、15 条示例；空文本（含纯空白）判单条 `high`「全文为空」（`type=格式`，`start=-1`）并跳过其余检查；前端不前置拦截，照常展示内核结论 |
 | C ABI | `yyb_check_json_n` / `yyb_list_templates_json` / `yyb_list_samples_json` / `yyb_rule_version` / `yyb_free` |
 | Rust 命令 | `api_version` / `list_templates` / `list_samples` / `check_text` / `load_text_file` / `check_files` / `pick_text_files` / `save_report` |
 | 文件解码 | UTF-16LE/BE BOM → 严格 UTF-8 → GB18030，统一去 BOM；`.docx` 走 `docx.rs` 抽正文（§5.4）；`.pdf/.doc` 仍返回 `E_UNSUPPORTED_FORMAT` |
@@ -335,7 +347,7 @@ start "" "%LOCALAPPDATA%\YanYiBian\yanyibian.exe"
 | AI 报 `E_AI_CONNECT` / `E_AI_HTTP_*` | 服务地址不可达、Key 错、模型名错 | 先用 `node tools/ai-mock/server.mjs 8799` 自测；`http://` 只允许 localhost |
 | AI 返回「全部缺陷」需人工处理 | 模型的改动全被本地守卫拦下（改数字/片段不唯一/超长） | 属预期：数字与事实类改动一律交人工，见 `docs/ai-api-rules.md` §9.2 |
 | 启动即 panic，`HRESULT(0x8007139F)`「组或资源的状态不是执行请求操作的正确状态」 | WebView2 数据目录已损坏（常见于低完整性环境下反复失败的残留） | 关闭应用，把 `%LOCALAPPDATA%\cn.yanyibian.desktop` 改名（如加 `.bak`）后重启；v1.5 尚未自动避险（R-26） |
-| 想清掉已保存的 Key | 后端只在内存，但 v1.5 起前端把 Key 存进本机 `localStorage` | 设置页点「清除已保存的 Key」（同时清后端与本地存储） |
+| 想清掉已保存的 Key | v1.8 只存在后端进程内存 | 壳页 AI 区块点「清除 Key」；或直接重启应用 |
 
 ## 9. 待补充清单（本文相关）
 
@@ -380,7 +392,7 @@ scripts\verify-all.bat
 
 | 判据 | 期望 |
 |---|---|
-| 差分门禁 | `[parity] PASS 538/538 一致（RULE_VERSION=yyb-3）` |
+| 差分门禁 | `[parity] PASS 593/593 一致（RULE_VERSION=yyb-4）` |
 | 冒烟 | `yyb-check weekly tools\parity\fixtures\smoke-weekly.txt` → `chars 78`、`defects 3`、`passes 5` |
 | 收尾 | `ALL CHECKS PASSED` |
 | 单测（可选但建议） | `scripts\test-windows.bat ai::` → `3 passed` |
@@ -409,7 +421,7 @@ scripts\build-bundle.bat
 | 安装 | `YanYiBian_*_x64-setup.exe /S` | 出现 3 个 exe（本机实测落在 `D:\YanYiBian\`，注册表 `InstallLocation` 同值；**（待核实）** NSIS 记住上次目录的行为）；`HKCU\...\Uninstall\YanYiBian` 有 9 项 |
 | 启动 | 从开始菜单启动 | 窗口出现，顶栏显示规则版本 badge |
 | 判定 | 批量页选 `tools\parity\fixtures\smoke-weekly.txt` | 结论「不建议直接交付」+ 3 条缺陷 + 5 项通过 |
-| 配置 | 设置页保存配置 → 退出 → 重启 | Key 回填（v1.5），`enabled` 仍为关闭态 |
+| 配置 | 壳页保存配置 → 退出 → 重启 | v1.8：配置与 Key 都不保留，需重填（`ai_get_config` 返回 `hasKey=false`） |
 | 卸载 | `uninstall.exe /S` | 目录、注册表、快捷方式消失（`%LOCALAPPDATA%\cn.yanyibian.desktop` 保留） |
 
 ### 10.5 第 5 步：推送仓库（**当前卡点**）
@@ -462,7 +474,7 @@ git push -u origin （待补充：分支名）
 ## 附：v1.7 目录迁移说明（2026-11-01）
 
 - 本仓库已从「桌面端 + 零框架前端 `ui/`」改为**仅后端程序**：`ui/` 整体移除，改为最小壳页 `shell/`（`index.html` + `app.js` + `style.css`，可试校验，不是产品级界面）。
-- 规格真源改为仓库内副本 `tools/parity/spec/yanyibian.js`（原跨仓库路径 `../验一遍/yanyibian.js` 已废弃）；`RULE_VERSION` 当时为 `yyb-2`（v1.7 起为 `yyb-3`）。
+- 规格真源改为仓库内副本 `tools/parity/spec/yanyibian.js`（原跨仓库路径 `../验一遍/yanyibian.js` 已废弃）；`RULE_VERSION` 当时为 `yyb-2`（v1.7 起为 `yyb-3`，v1.8 起为 `yyb-4`）。
 - 冒烟样本文档路径改为 `tools/parity/fixtures/smoke-weekly.txt`（原 `build/smoke-weekly.txt`，`build/` 已进 `.gitignore`）。
 - 文中出现的 `<仓库根>`、`（待补充：…）` 是替换后的占位；绝对路径已全部去除。
 - 文档中带行号的 `shell/*` 引用沿用 v1.6 的旧行号，v1.7 的壳页代码更短，行号可能偏移；判定逻辑不受影响。

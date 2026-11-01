@@ -14,13 +14,23 @@ const require = createRequire(import.meta.url);
 const YYB = require(resolve(appRoot, "tools/parity/spec/yanyibian.js"));
 
 const TPLS = Object.keys(YYB.TEMPLATES);
+
+/* 0. 示例数量契约：每套模板至少 3 条示例，否则门禁直接失败（v1.8 起） */
+for (const tpl of TPLS) {
+  const n = YYB.SAMPLES.filter((s) => s.tpl === tpl).length;
+  if (n < 3) throw new Error(`模板 ${tpl} 只有 ${n} 条示例，要求至少 3 条`);
+}
+for (const s of YYB.SAMPLES) {
+  if (!YYB.TEMPLATES[s.tpl]) throw new Error(`示例 ${s.title} 引用了未知模板 ${s.tpl}`);
+}
+
 const cases = [];
 let seq = 0;
 const add = (tpl, text) => {
   cases.push({ id: "c" + String(++seq).padStart(4, "0"), tpl, text });
 };
 
-/* 1. 三条示例：跨全部模板各跑一遍（3 x 4 = 12） */
+/* 1. 示例文本：每套 3 条、共 15 条，跨全部模板各跑一遍（15 x 5 = 75） */
 for (const s of YYB.SAMPLES) {
   for (const tpl of TPLS) add(tpl, s.text);
 }

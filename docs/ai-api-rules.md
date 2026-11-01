@@ -22,16 +22,17 @@
 | 允许改数字 `allow_fact_edit` | `false` | `ai.rs:26-43` |
 | 超时 `timeout_ms` | 20000 | `ai.rs:44-46` |
 | 重试次数 `max_retry` | 1 | `ai.rs:47-50` |
-| API Key | 用户自填；v1.5 起存本机 `localStorage`（明文，见 §4） | `ai.rs:70-73`、`shell/app.js` 的 `AI_STORE` |
+| API Key | 用户自填；v1.8 起壳页只存进程内存（`Mutex<Option<String>>`），不落盘 | `ai.rs:70-73` |
 
-**开启步骤（可执行）**：顶栏「设置」→ 卡片「AI 修改」→ 勾「启用外部 AI」→ 选服务商 / 填接口地址 / 填模型名 / 填 API Key → 点「保存设置」→ 点「← 返回校验」，在单篇页的「AI 修改」面板点「让 AI 生成修改稿」。（v1.5 起配置集中在 `#view-settings`。）
-保存走 `ai_set_config`（`ai.rs:145-162`），前端在 `shell/app.js:409-431`。
+**开启步骤（可执行，v1.8 壳页）**：在 `shell/index.html` 的「AI 修改（可选）」区块里勾「启用」→ 选服务商 / 填接口地址 / 填模型名 / 填 API Key → 点「保存设置」→ 点「生成修改稿」。
+保存走 `ai_set_config`（`ai.rs:145-162`），前端在 `shell/app.js` 的 `saveAi()`。
+> v1.8 说明：v1.5 的独立设置页与 `localStorage` 持久化随 `ui/` 一并移除；壳页恢复的是四个命令的**调用入口**，配置只存在进程内存，重启需重填。（是否恢复本机持久化与加密方案：待补充 Q-33。）
 
 **关闭行为（可验收）**：
 
 1. 取消勾选并保存后，`ai_revise` 立即返回 `E_AI_OFF`，**不发起任何 HTTP 请求**（`ai.rs:534-538`）。
 2. 关闭不改变已有校验结果、不清空编辑器、不删除已导出的文件。
-3. 关闭后 Key 仍留在内存但不使用；重开应用会从本机存储回填 Key，但 `enabled` 不落盘，仍为关闭态（v1.5，见 §4）。
+3. 关闭后 Key 仍留在内存但不使用；**重启应用后 Key 与配置都不保留**（v1.8：无本机持久化），需要重新填写。
 4. 实测：关闭状态下调用 5 次，mock 服务端计数为 0（见 §14 验收 C4）。
 
 ## 3. 服务方与协议
@@ -52,16 +53,16 @@
 | 规则 | 说明 | 位置 |
 | --- | --- | --- |
 | 用户自填 | 应用不内置任何 Key、不代理、不中转 | `ai.rs:146-162` |
-| 本机持久化（v1.5） | 后端 `Mutex<Option<String>>` 只在内存；前端把 Key 写进 `localStorage["yyb.ai.cfg.v1"]`（WebView2 数据目录，**明文**），启动时由 `restoreStoredKey()` 回填 | `ai.rs:70-73`、`shell/app.js` 的 `writeStore` / `restoreStoredKey` |
+| 存放位置（v1.8） | 只在后端 `Mutex<Option<String>>`；壳页输入框不写 `localStorage` / 文件 / 日志，保存后立即清空输入框 | `ai.rs:70-73`、`shell/app.js` 的 `saveAi` / `paintAi` |
 | 不回传前端 | `ai_get_config` 只返回 `hasKey:boolean`，永不返回 Key 本身 | `ai.rs:122-144` |
 | 三种写入语义 | `null`=不改、`""`=清除、其它=替换 | `ai.rs:146-162` |
 | 启用前必须有 Key | 否则 `E_AI_NO_KEY: 启用前请先填写 API Key` | `ai.rs:146-162` |
 | 调用时缺 Key | `E_AI_NO_KEY: 未填写 API Key` | `ai.rs:540-544` |
 | 界面掩码 | `<input type="password">`，保存后清空输入框并改占位文案 | `shell/index.html:86`、`shell/app.js:419-424` |
-| 重启后仍在 | v1.5：Key 存在本机，重开自动回填表单并推回后端内存；`enabled` 不落盘 | `shell/app.js` 的 `restoreStoredKey` |
-| 可清除 | 设置页「清除已保存的 Key」→ `ai_set_config{apiKey:""}` + `key:null` | `clearAiKey` |
+| 重启后 | v1.8：不保留（进程内存），重启后 `ai_get_config` 返回 `hasKey=false` | `ai.rs:122-136` |
+| 可清除 | 壳页「清除 Key」按钮 → `ai_set_config{apiKey:""}`（内存即刻清空） | `shell/app.js` 的 `clearAiKey` |
 
-风险提示（必须让用户看到）：v1.5 起 Key **明文**写在 `AppData\LocalLow\cn.yanyibian.desktop` 下的 WebView2 `localStorage` 里，同用户权限的其它进程可直接读取；加密方案（DPAPI / Keystore）**（待补充：Q-33）**。仍**不要填长期/高额度 Key**，建议单独签发受限 Key。设置页已用 amber 块明示该风险。
+风险提示（必须让用户看到）：v1.8 不落盘，因此**不存在**"Key 被同机其它进程从磁盘读走"的风险；代价是每次重启都要重填。若后续恢复持久化，必须用 DPAPI / Keystore 加密（**待补充：Q-33**）。仍**不要填长期/高额度 Key**，建议单独签发受限 Key。
 
 ## 5. 权限范围（发什么 / 不发什么）
 
@@ -117,9 +118,9 @@
 | 规则 | 实现 | 位置 |
 | --- | --- | --- |
 | 不写日志文件 | 全仓没有日志文件写入；GUI 主程序无 `println!` 到文件，只有 debug 构建在启动时打印数据目录；命令行工具 `yyb-check` 打印到 stdout（不是产品行为） | `src-tauri/src/lib.rs:75-77`、`src-tauri/src/bin/yyb_check.rs:15-96` |
-| 不写 localStorage / indexedDB | 前端只把结果放内存 `state.ai` | `shell/app.js:410-414` |
+| 不写 localStorage / indexedDB | 壳页只把结果放内存 `ai.result`，配置与 Key 不进浏览器存储 | `shell/app.js` 的 `var ai = { ... }` |
 | 不留历史 | 关窗即丢；批量结果也不落盘 | 同上 |
-| 导出才算留存 | 只有用户点「导出交付包」才写一个 .md（走系统保存框，写盘只在 `save_report`） | `shell/app.js:603-614`、`src-tauri/src/commands.rs:149-170` |
+| 导出才算留存 | 壳页的「复制交付包」只写剪贴板（`navigator.clipboard`，失败回退 `execCommand`），不落盘；`save_report` 命令仍在但壳页未接 | `shell/app.js` 的 `copyText` / `buildDelivery`、`src-tauri/src/commands.rs:149-170` |
 | 可核对 | 无痕扫描：在校验文本里埋标记后扫数据目录，命中数应为 0 | §14 验收 C6 |
 
 **已实测**：本机 `%LOCALAPPDATA%\\cn.yanyibian.desktop`（WebView2 配置目录）169 个文件、158 个可读，扫 `MARKER-A6-9931` 命中 0。
@@ -192,7 +193,7 @@
 ## 12. 已知限制（如实记录）
 
 1. 取消是"返回后丢弃"，不节省流量与服务商计费。
-2. Key 自 v1.5 起本机持久化（明文 `localStorage`），重启自动回填；系统凭据库（DPAPI/Keystore）仍未集成 —— 方案 §8.4.1 提到过，Q-33 待办。
+2. Key 自 v1.8 起只在进程内存（不落盘），重启即失效；系统凭据库（DPAPI/Keystore）仍未集成 —— 方案 §8.4.1 提到过，Q-33 待办。
 3. 提示词里的长度建议（200/400 字）比本地硬上限（400/1200 字）更严，属"提示词保守 + 守卫兜底"的有意设计。
 4. 只支持 OpenAI 兼容协议；不支持 Anthropic/Gemini 原生协议。
 5. 不做流式输出：一次性返回、一次性渲染。

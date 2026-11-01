@@ -27,7 +27,7 @@
       <h2>要交付的文本</h2>
       <div class="actions">
         <button id="btn-open" class="btn">打开文件…</button>
-        <button id="btn-sample" class="btn">填入示例</button>
+        <button id="btn-sample" class="btn">随机示例</button>
         <button id="btn-check" class="btn btn-primary">查一遍</button>
       </div>
     </div>
@@ -42,6 +42,33 @@
     <ul id="defects" class="list"></ul>
     <h3>已通过</h3>
     <ul id="passes" class="list pass"></ul>
+  </section>
+  <section class="pane" aria-label="AI 修改">
+    <div class="pane-head">
+      <h2>AI 修改（可选）</h2>
+      <label class="chk"><input type="checkbox" id="ai-enabled"> 启用</label>
+    </div>
+    <p class="note">默认关闭，关闭时不发任何网络请求。开启后点「生成修改稿」才会把正文与缺陷清单发给你配置的服务；判定仍由本地内核完成，改动落地后自动复检。</p>
+    <div class="ai-grid">
+      <label class="f"><span>服务商</span>
+        <select id="ai-provider">
+          <option value="openai">OpenAI</option>
+          <option value="deepseek">DeepSeek</option>
+          <option value="custom">自定义</option>
+        </select>
+      </label>
+      <label class="f"><span>模型</span><input id="ai-model" placeholder="如 gpt-4o-mini"></label>
+      <label class="f wide"><span>接口地址</span><input id="ai-base" placeholder="https://api.openai.com/v1"></label>
+      <label class="f wide"><span>API Key</span><input id="ai-key" type="password" autocomplete="off" placeholder="只存在本机内存，不落盘、不回显"></label>
+    </div>
+    <div class="actions ai-actions">
+      <button id="btn-ai-save" class="btn">保存设置</button>
+      <button id="btn-ai-clear" class="btn">清除 Key</button>
+      <button id="btn-ai-run" class="btn btn-primary" disabled>生成修改稿</button>
+      <button id="btn-ai-cancel" class="btn" disabled>取消</button>
+    </div>
+    <p id="ai-hint" class="hint" role="status" aria-live="polite"></p>
+    <div id="ai-out" class="ai-out"></div>
   </section>
 </main>
 
