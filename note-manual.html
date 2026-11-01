@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<script>/* 主题须在首帧前定下来，否则会先闪暗色再跳。默认暗色，不跟随系统。 */(function(){try{var t=localStorage.getItem("sheenova-theme");document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark");}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>给未来的自己留一份使用说明 · 汐星札记</title>
+<meta name="description" content="记录不是为了显得完整，而是为了下次重新开始时少绕一点路。写给三个月后那个什么都不记得的自己。">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="汐星札记">
+<meta property="og:title" content="给未来的自己留一份使用说明">
+<meta property="og:description" content="记录不是为了显得完整，而是为了下次重新开始时少绕一点路。">
+<meta property="og:url" content="https://sheenova.cn/note-manual.html">
+<meta property="og:image" content="https://sheenova.cn/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="notes.css">
+<link rel="stylesheet" href="theme.css?v=1">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="index.html"><span class="arrow">←</span> 回到首页</a>
+    <a class="brand-mini" href="index.html">汐星札记</a>
+<button class="theme-toggle" type="button" aria-label="切换到白天模式" aria-pressed="false">
+  <svg class="ti-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.1M12 19.3v2.1M2.6 12h2.1M19.3 12h2.1M5.4 5.4l1.5 1.5M17.1 17.1l1.5 1.5M18.6 5.4l-1.5 1.5M6.9 17.1l-1.5 1.5"/></svg>
+  <svg class="ti-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.6 14.7A8.7 8.7 0 1 1 9.3 3.4a6.9 6.9 0 0 0 11.3 11.3Z"/></svg>
+</button>
+  </div>
+</div>
+
+<article class="article">
+  <header class="article-head">
+    <p class="cat">随想</p>
+    <h1 class="article-title">给未来的自己留一份使用说明</h1>
+    <div class="article-meta">
+      <span>2026.08.11</span>
+      <span>5 分钟阅读</span>
+    </div>
+    <p class="lede">记录不是为了显得完整，而是为了下次重新开始时少绕一点路。</p>
+  </header>
+
+  <div class="body">
+
+    <p>前阵子办备案，走到某一步的时候我停下来，发现自己完全想不起来上一步做了什么。</p>
+
+    <p>初审的电话是什么时候接的？那条短信核验点没点？当时明明觉得「这个不用担心，到时候自然知道」。</p>
+
+    <p>事实证明不会知道。</p>
+
+    <h2>这类记录是写给谁的</h2>
+
+    <p>我开始认真记东西，不是因为觉得应该记，是吃过亏。</p>
+
+    <p>这些东西没什么宏大目的，它只有一个读者：三个月后那个什么都不记得的我。</p>
+
+    <p>三个月足够忘掉几乎所有细节，但三个月后又往往需要重新捡起来。中间那段时间差，就是这件事存在的意义。</p>
+
+    <h2>几件我确实忘了的事</h2>
+
+    <p>备案其实有三道关，每关的联系方式都不一样：</p>
+
+    <ul>
+      <li>云服务商初审：一到两个工作日，会打电话核实，两次联系不上就驳回</li>
+      <li>工信部短信核验：<code>12381</code> 发六位验证码，24 小时内必须完成，超时自动退回重来</li>
+      <li>管局审核：八到二十个工作日，结果通过短信和邮件告知</li>
+    </ul>
+
+    <p>这三件事我在一周之内就全忘了顺序。更麻烦的是第二关有硬性时限，忘了就等于从头再来一遍。</p>
+
+    <p>还有一件：一台 2 核 2G 的服务器装不了 MySQL 8.0。宝塔对它的内存门槛是 <code>3700MB</code>，我只有 <code>2048MB</code>，差了 1.6GB。作为对比，5.7 只要 1560MB，5.6 只要 768MB。这几个数字当时我查了小半天，现在如果让我重查一遍，还是得小半天。</p>
+
+    <h2>关于「为什么」，代码是不会说的</h2>
+
+    <p>后来我才知道，这类记录在工程领域有个正式名字，叫架构决策记录，简称 ADR。</p>
+
+    <p>GitHub 的博客里有一句话我很喜欢：ADR 不是为你写的，是为未来的你写的。它帮你在六到十二个月之后，重新回到当时做决定的心智状态。</p>
+
+    <p>我看到过一个特别精准的例子。有位独立开发者在做预约系统的时候，决定把价格直接存在预约记录里，而不是每次去引用服务当前的价格。代码本身很清楚，价格就在那儿。但代码没说的是为什么——改服务价格不应该追溯改变过去已经谈好的预约，这在开票场景下是有法律意义的。</p>
+
+    <p>问题在于，一年半以后他自己（或者任何接手的人）看到这段代码，很可能觉得这是个疏忽，然后动手把它「修」掉。而那个修复会引入一个真正的 bug。</p>
+
+    <p>原文那句话说得很准：代码看起来是错的，但它没错，而这个差别是看不见的。</p>
+
+    <h2>不需要工具，只需要习惯</h2>
+
+    <p>ADR 听起来很正式，好像得配一套流程和模板。其实不用。</p>
+
+    <p>那位开发者说得很实在：一个决策日志可以就是一个放编号 Markdown 文件的目录，甚至可以是代码里一句恰到好处的注释，写清楚「这里是有意这么做的，原因如下」。</p>
+
+    <p>他的格式很简单：决定是什么、日期、考虑过哪些替代方案、是什么约束把其他方案排除了，以及什么情况下会重新考虑。最后一条我觉得最重要。决定不是永久的，当初让它成立的那个约束可能会消失。</p>
+
+    <p>多久写一次也有个宽松的标准：这件事以后会不会有人需要？改起来麻不麻烦？两个都答「是」，就写一条。</p>
+
+    <p>有人分享过坚持下来的实际效果。他们攒了十四条记录，新人入职一次坐下就能读完；从入职到第一次有意义的提交，时间从大概一个月缩短到一两周。有两次计划中的改动，在写记录的阶段就被推翻了，因为老实把替代方案列出来之后，第一个想法自己就站不住了。</p>
+
+    <p>他们提到的一个细节我印象很深：重构模块时，「移除了一个没人看得懂的临时方案」这类事故降到了零。因为在动手之前，你能先看到当初为什么那么写，于是要么有意保留，要么安全删掉。</p>
+
+    <hr>
+
+    <p>所以我现在记东西的标准放得很低。不追求结构完整，不追求措辞好看，只要下次打开的时候能让我想起来，就够了。</p>
+
+    <p>那位开发者最后写了一句话，我也抄下来了：你会忘记。写下来。</p>
+
+  </div>
+
+  <footer class="article-foot">
+    <p class="signature">写于 <strong>2026.08.11</strong> · 汐星札记</p>
+    <div class="next-links">
+      <a href="note-model-to-app.html">← 上一篇：从模型到应用，中间隔着什么</a>
+    </div>
+  </footer>
+</article>
+
+<script src="theme.js?v=1"></script>
+</body>
+</html>

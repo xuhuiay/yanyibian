@@ -1,0 +1,185 @@
+/* 笔记文章页共享样式 —— 沿用主站深空玻璃拟态的视觉语言 */
+
+:root{
+  --blue:#5B86FF; --aqua:#6FE3E8; --violet:#BB8CFF;
+  --ink:#E8EDFB; --muted:rgba(232,237,251,.66); --dim:rgba(232,237,251,.42);
+  --glass:rgba(255,255,255,.045);
+  --brd:rgba(255,255,255,.1);
+  --hair:rgba(255,255,255,.08);
+  --serif:'Noto Serif SC',Georgia,serif;
+  --sans:'Noto Sans SC',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+
+body{
+  margin:0; padding:0 24px 96px;
+  background:
+    radial-gradient(1100px 560px at 50% -8%, rgba(91,134,255,.15), transparent 62%),
+    radial-gradient(820px 460px at 88% 108%, rgba(187,140,255,.11), transparent 62%),
+    linear-gradient(180deg,var(--bg-stop-1) 0%,var(--bg-stop-2) 52%,var(--bg-stop-3) 100%);
+  background-attachment:fixed;
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:16px; line-height:1.95;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- 顶部返回 ---------- */
+.topbar{
+  position:sticky; top:0; z-index:10;
+  backdrop-filter:blur(14px) saturate(150%);
+  -webkit-backdrop-filter:blur(14px) saturate(150%);
+  background:rgba(var(--panel-1-rgb), .72);
+  border-bottom:1px solid var(--hair);
+  margin:0 -24px 64px; padding:0 24px;
+}
+.topbar-inner{
+  max-width:760px; margin:0 auto;
+  display:flex; align-items:center; justify-content:space-between;
+  height:62px;
+}
+.back{
+  display:inline-flex; align-items:center; gap:8px;
+  font-size:13.5px; color:var(--muted); text-decoration:none;
+  transition:color .25s;
+}
+.back:hover{color:var(--aqua)}
+.back .arrow{transition:transform .25s}
+.back:hover .arrow{transform:translateX(-3px)}
+.brand-mini{
+  font-family:var(--serif); font-size:14px; letter-spacing:.06em;
+  color:var(--dim); text-decoration:none;
+}
+
+/* ---------- 文章容器 ---------- */
+.article{max-width:720px; margin:0 auto}
+
+.article-head{margin-bottom:52px}
+.cat{
+  display:inline-block; margin:0 0 20px;
+  font-size:12px; letter-spacing:.24em; color:var(--aqua);
+  text-transform:uppercase;
+}
+.article-title{
+  font-family:var(--serif); font-weight:700;
+  font-size:38px; line-height:1.42; letter-spacing:.01em;
+  margin:0 0 20px;
+}
+.article-meta{
+  font-size:13px; color:var(--dim); letter-spacing:.04em;
+  display:flex; gap:16px; flex-wrap:wrap;
+  padding-top:18px; border-top:1px solid var(--hair);
+}
+.lede{
+  font-size:17.5px; line-height:1.9; color:var(--muted);
+  margin:26px 0 0; padding-left:18px;
+  border-left:2px solid rgba(111,227,232,.4);
+}
+
+/* ---------- 正文 ---------- */
+.body p{margin:0 0 26px}
+.body h2{
+  font-family:var(--serif); font-weight:600;
+  font-size:23px; line-height:1.6; letter-spacing:.01em;
+  margin:56px 0 22px;
+}
+.body h2:first-child{margin-top:0}
+.body strong{font-weight:500; color:var(--ink)}
+.body em{font-style:normal; color:var(--aqua)}
+
+.body ul,.body ol{margin:0 0 28px; padding-left:22px}
+.body li{margin-bottom:12px}
+.body li::marker{color:var(--aqua)}
+
+.body blockquote{
+  margin:32px 0; padding:20px 24px;
+  border-radius:16px;
+  background:var(--glass);
+  border:1px solid var(--brd);
+  color:var(--muted);
+}
+.body blockquote p{margin:0}
+.body blockquote p+p{margin-top:12px}
+
+/* 行内代码与数字强调 */
+code{
+  font-family:'Space Grotesk',ui-monospace,Consolas,monospace;
+  font-size:.9em; padding:2px 7px; border-radius:6px;
+  background:rgba(91,134,255,.14);
+  border:1px solid rgba(91,134,255,.22);
+  color:var(--aqua);
+}
+
+/* 数据块：用于放外部引用数据 */
+.figures{
+  margin:36px 0; padding:26px 28px; border-radius:18px;
+  background:var(--glass);
+  border:1px solid var(--brd);
+}
+.figures h3{
+  font-family:var(--serif); font-size:15px; font-weight:600;
+  margin:0 0 18px; color:var(--ink); letter-spacing:.02em;
+}
+.figures ul{margin:0; padding-left:20px; list-style:none}
+.figures li{
+  position:relative; margin-bottom:14px; font-size:14.5px;
+  line-height:1.75; color:var(--muted); padding-left:16px;
+}
+.figures li:last-child{margin-bottom:0}
+.figures li::before{
+  content:''; position:absolute; left:0; top:.72em;
+  width:6px; height:6px; border-radius:50%;
+  background:linear-gradient(100deg,var(--blue),var(--aqua));
+}
+.figures b{color:var(--ink); font-weight:500}
+.source{
+  margin:16px 0 0; font-size:12.5px; color:var(--dim);
+  letter-spacing:.02em;
+}
+
+/* 分隔线 */
+.body hr{
+  border:0; height:1px; background:var(--hair);
+  margin:52px 0;
+}
+
+/* ---------- 文末 ---------- */
+.article-foot{
+  margin-top:64px; padding-top:28px;
+  border-top:1px solid var(--hair);
+  display:flex; align-items:center; justify-content:space-between;
+  gap:20px; flex-wrap:wrap;
+}
+.signature{font-size:14px; color:var(--dim)}
+.signature strong{color:var(--muted); font-weight:500}
+.next-links{display:flex; gap:16px; flex-wrap:wrap}
+.next-links a{
+  font-size:13.5px; color:var(--muted); text-decoration:none;
+  transition:color .25s;
+}
+.next-links a:hover{color:var(--aqua)}
+
+/* ---------- 响应式 ---------- */
+@media (max-width:640px){
+  body{padding:0 20px 72px; font-size:15.5px}
+  .topbar{margin:0 -20px 44px; padding:0 20px}
+  .article-title{font-size:29px}
+  .body h2{font-size:21px; margin:44px 0 18px}
+  .lede{font-size:16px}
+  .figures{padding:22px 20px}
+}
+
+/* 键盘焦点：默认 outline 在深底上不明显，改用品牌青色 */
+:focus-visible{
+  outline:2px solid var(--aqua);
+  outline-offset:3px;
+  border-radius:4px;
+}
+
+/* 尊重系统的"减少动态效果"设置 */
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  .back .arrow,.back:hover .arrow{transition:none; transform:none}
+}

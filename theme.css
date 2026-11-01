@@ -1,0 +1,385 @@
+/* ============================================================
+   汐星札记 —— 昼夜主题
+   ============================================================
+
+   架构
+   ----
+   主题由 <html data-theme="light|dark"> 驱动。默认暗色，因为那是站点
+   现有的样子——跟随系统会改变现有访客看到的第一印象。
+
+   本文件在所有页面样式**之后**加载。必须如此：`[data-theme="light"]`
+   与 `:root` 的特异性同为 (0,1,0)，谁在后面谁生效。
+
+   站点有 5 份页面 CSS（style / notes / datawave / starflow / sheentalk），
+   各有一套自己的变量名。所幸同名变量的语义是一致的（--muted 在哪都是
+   「次要文字」），所以这里可以一份覆盖全部，不必逐页写四遍。
+
+   关于 rgba(var(--x-rgb), α)
+   --------------------------
+   页面 CSS 里原本散着 38 处 rgba(255,255,255,α) 和 23 处深色实底。
+   它们已抽成颜色三元组变量，alpha 原样留在原地：
+       暗色：--ovl-rgb: 255,255,255   → 渲染结果与改前逐字节相同
+       亮色：--ovl-rgb: 18,26,51      → 同一套 alpha 自然变成深色叠加
+   好处是亮色不必逐个重调 alpha——那些 .015/.035/.075 的细微差别是
+   有意的层次设计，逐个翻译只会走样。
+   ============================================================ */
+
+/* ============================================================
+   可插值的自定义属性
+   ============================================================
+
+   这是过渡能否平滑的关键，不是可选项。
+
+   **未注册的自定义属性，值的变化是离散的。** 也就是说 --bg-stop-1 从
+   #06081A 翻到 #FAFBFF 是一步到位的，于是引用它的 linear-gradient
+   跟着一步到位 —— 整页背景瞬跳，而文字还在慢慢淡入。
+   列表里写 background-image .42s 完全没用：CSS 根本无法在两个
+   linear-gradient 之间插值。
+
+   用 @property 把类型声明出来（<color> 或数值列表），浏览器才肯逐帧
+   插值 —— 渐变色标会一帧一帧地变，整页背景就跟着平滑过渡。
+
+   附带好处：rgba(var(--ovl-rgb), .06) 这种写法也能一起过渡。
+   --ovl-rgb 是三元组，注册成 <number># 后按数值逐个插值，
+   于是 40 处叠加色（含 17 处在渐变内部）全部自动平滑。
+
+   兼容性：@property 在 Edge/Chrome 85+、Safari 16.4+、Firefox 128+ 支持。
+   **不支持时行为退回改造前（直接跳变），不会坏。**
+   ============================================================ */
+
+@property --ovl-rgb { syntax: "<number>#"; inherits: true; initial-value: 255, 255, 255; }
+@property --panel-1-rgb { syntax: "<number>#"; inherits: true; initial-value: 6, 9, 22; }
+@property --panel-2-rgb { syntax: "<number>#"; inherits: true; initial-value: 8, 12, 29; }
+@property --panel-3-rgb { syntax: "<number>#"; inherits: true; initial-value: 11, 16, 37; }
+@property --panel-4-rgb { syntax: "<number>#"; inherits: true; initial-value: 5, 9, 25; }
+@property --panel-5-rgb { syntax: "<number>#"; inherits: true; initial-value: 13, 19, 43; }
+@property --panel-6-rgb { syntax: "<number>#"; inherits: true; initial-value: 2, 4, 13; }
+
+@property --bg-stop-1 { syntax: "<color>"; inherits: true; initial-value: #06081A; }
+@property --bg-stop-2 { syntax: "<color>"; inherits: true; initial-value: #080C22; }
+@property --bg-stop-3 { syntax: "<color>"; inherits: true; initial-value: #060918; }
+
+@property --tide-1 { syntax: "<color>"; inherits: true; initial-value: #5B86FF; }
+@property --tide-2 { syntax: "<color>"; inherits: true; initial-value: #6FE3E8; }
+@property --tide-3 { syntax: "<color>"; inherits: true; initial-value: #BB8CFF; }
+
+/* 下面这几个是被**品牌渐变**引用的颜色变量（按钮、徽标、下划线等）。
+   它们同样在主题间变化，不注册的话那些渐变也是瞬跳 ——
+   按钮底色会在 0.42 秒里其余部分都在淡入时独自闪一下。 */
+@property --blue { syntax: "<color>"; inherits: true; initial-value: #5B86FF; }
+@property --aqua { syntax: "<color>"; inherits: true; initial-value: #6FE3E8; }
+@property --accent { syntax: "<color>"; inherits: true; initial-value: #6FE3E8; }
+@property --violet { syntax: "<color>"; inherits: true; initial-value: #BB8CFF; }
+@property --bg { syntax: "<color>"; inherits: true; initial-value: #04060F; }
+@property --app-bg { syntax: "<color>"; inherits: true; initial-value: #070A17; }
+@property --glass-bg { syntax: "<color>"; inherits: true; initial-value: rgba(255, 255, 255, .045); }
+
+/* ---------------- 暗色（默认） ---------------- */
+
+:root {
+  color-scheme: dark;
+
+  /* 叠加面：深色下是白色叠加 */
+  --ovl-rgb: 255, 255, 255;
+
+  /* 面板底：编号保留原本的分层深度（顶栏 / 侧栏 / 工作区 / 控件 / 浮层 / 遮罩） */
+  --panel-1-rgb: 6, 9, 22;
+  --panel-2-rgb: 8, 12, 29;
+  --panel-3-rgb: 11, 16, 37;
+  --panel-4-rgb: 5, 9, 25;
+  --panel-5-rgb: 13, 19, 43;
+  --panel-6-rgb: 2, 4, 13;
+
+  /* 无 backdrop-filter 环境下的实心回退 */
+  --fallback-panel: #0D1430;
+
+  /* 笔记页 body 渐变的三段色标 */
+  --bg-stop-1: #06081A;
+  --bg-stop-2: #080C22;
+  --bg-stop-3: #060918;
+
+  /* 首屏 + CTA 标题的渐变字 */
+  --tide-1: #5B86FF;
+  --tide-2: #6FE3E8;
+  --tide-3: #BB8CFF;
+
+  /* 切换按钮自成一套 token，不依赖各页变量——
+     5 份页面 CSS 的变量名并不统一（--ink 只在 style/notes 有，
+     --text 只在实验页有），借用任何一个都会在别的页面失效。 */
+  --toggle-fg: #A9B4D4;
+  --toggle-fg-hover: #EAEFFD;
+  --toggle-bg: rgba(255, 255, 255, .06);
+  --toggle-bg-hover: rgba(255, 255, 255, .1);
+  --toggle-brd: rgba(255, 255, 255, .18);
+  --toggle-brd-hover: rgba(111, 227, 232, .45);
+  --toggle-hi: rgba(255, 255, 255, .07);
+  --toggle-glow: rgba(111, 227, 232, .5);
+
+  /* 状态色：实验页用来标运行结果。这几个色同时当圆点底和文字用，
+     所以亮色下统一压深——圆点变深绿仍然看得见，文字则从「几乎隐形」变成可读。 */
+  --state-ok: #7cf2c0;
+  --state-danger: #ff9aaf;
+  --state-warn: #f3c977;
+}
+
+/* ---------------- 亮色 ---------------- */
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  --ovl-rgb: 18, 26, 51;
+
+  /* 亮色下的分层逻辑与暗色相反：越靠近内容的面越白越实，
+     工作区保留最多透明以露出背景渐变。 */
+  --panel-1-rgb: 255, 255, 255;
+  --panel-2-rgb: 253, 254, 255;
+  --panel-3-rgb: 255, 255, 255;
+  --panel-4-rgb: 255, 255, 255;
+  --panel-5-rgb: 255, 255, 255;
+  /* 遮罩必须留深色，翻白会让弹层失去压暗效果 */
+  --panel-6-rgb: 18, 26, 51;
+
+  --fallback-panel: #FFFFFF;
+
+  --bg-stop-1: #FAFBFF;
+  --bg-stop-2: #EFF3FC;
+  --bg-stop-3: #F5F8FE;
+
+  /* 渐变字在浅底上要压深：#6FE3E8 只有 1.38:1 */
+  --tide-1: #2F5BE0;
+  --tide-2: #0B6F7A;
+  --tide-3: #7C4DDB;
+
+  --toggle-fg: #47516E;
+  --toggle-fg-hover: #101830;
+  --toggle-bg: rgba(255, 255, 255, .66);
+  --toggle-bg-hover: rgba(255, 255, 255, .92);
+  --toggle-brd: rgba(16, 24, 48, .14);
+  --toggle-brd-hover: rgba(11, 111, 122, .5);
+  --toggle-hi: rgba(255, 255, 255, .95);
+  --toggle-glow: rgba(11, 111, 122, .3);
+
+  /* 状态色压深到 4.8:1 以上 */
+  --state-ok: #0F7A52;
+  --state-danger: #C42B45;
+  --state-warn: #8A5A00;
+
+  /* ---- 以下按页面分组，覆盖各页自己的变量 ---- */
+
+  /* style.css（首页） */
+  --bg: #F1F4FB;
+  --bg-2: #E6EBF7;
+  --ink: #101830;
+  --ink-2: #47516E;
+  --ink-3: #666F8A;
+  --primary: #2F5BE0;
+  --aqua: #0B6F7A;
+  --violet: #7C4DDB;
+  --glass-bg: rgba(255, 255, 255, .58);
+  --glass-bg-2: rgba(255, 255, 255, .78);
+  --glass-brd: rgba(16, 24, 48, .08);
+  --glass-brd-2: rgba(16, 24, 48, .14);
+  --glass-hi: rgba(255, 255, 255, .9);
+  --hairline: rgba(47, 91, 224, .16);
+  --hairline-strong: rgba(47, 91, 224, .28);
+  /* 背景与渐变字已改由 --bg-stop-* / --tide-* 拼装（见上方），
+     这里不再需要整条渐变的覆盖。 */
+
+  /* notes.css（笔记页） */
+  --blue: #2F5BE0;
+  --muted: #47516E;
+  --dim: #666F8A;
+  --glass: rgba(255, 255, 255, .58);
+  --brd: rgba(16, 24, 48, .09);
+  --hair: rgba(16, 24, 48, .07);
+
+  /* datawave / starflow / sheentalk（实验页） */
+  --text: #101830;
+  --line: rgba(16, 24, 48, .10);
+  --line-strong: rgba(16, 24, 48, .18);
+  --accent: #0B6F7A;
+  --panel: rgba(255, 255, 255, .8);
+  --panel-strong: rgba(255, 255, 255, .95);
+  --app-bg: #F1F4FB;
+
+  /* 实验页里几处品牌色做主色底的地方，文字用的是深色，
+     亮色下渐变保持原样即可，无需覆盖 --grad-btn / --blue-deep */
+}
+
+/* ------------------------------------------------------------
+   动态背景在亮色下要收敛
+   星空粒子与流星是为深色天空画的，搁在白底上会像脏点。
+   用透明度淡出而不是 display:none，让主题切换时能一起过渡。
+   ------------------------------------------------------------ */
+#cosmos {
+  transition: opacity .42s var(--ease, cubic-bezier(.22, .61, .36, 1));
+}
+[data-theme="light"] #cosmos { opacity: .1; }
+
+/* ============================================================
+   切换过渡
+   ============================================================
+
+   只在切换的那一刻挂上 .theme-anim，动画结束后由 JS 摘掉。
+   常驻会让 hover 这类即时反馈也拖到 400ms，手感发黏。
+
+   过渡属性只列颜色类，**不含 transform**：切换主题时若有元素正在
+   位移，把它一并纳入过渡会让动画走出去再弹回来。
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   注册过的自定义属性**只能挂在根元素上过渡一次**。
+
+   它们是可继承的：html 在插值，body 又在 html 给出的（移动中的）
+   目标上再插值一次，每一层都叠加一次延迟。实测 5 层嵌套下，
+   2 秒才走到 64%，正常应该是 0.42 秒走完 —— 表现就是越深的元素
+   越慢，整页像在爬。挂到 `*` 上是这次过渡「不对劲」的根因。
+
+   挂在根元素上，子元素会自动继承插值后的值，一次插值全站生效。
+   ------------------------------------------------------------ */
+html.theme-anim {
+  transition:
+    --ovl-rgb .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    --panel-1-rgb .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    --panel-2-rgb .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    --panel-3-rgb .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    --panel-4-rgb .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    --panel-5-rgb .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    --panel-6-rgb .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    --bg-stop-1 .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    --bg-stop-2 .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    --bg-stop-3 .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    --tide-1 .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    --tide-2 .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    --tide-3 .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    --blue .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    --aqua .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    --accent .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    --violet .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    --bg .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    --app-bg .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    --glass-bg .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    /* 根元素自身的颜色属性也带上，免得漏掉 */
+    background-color .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    color .42s var(--ease, cubic-bezier(.22, .61, .36, 1)) !important;
+  transition-delay: 0s !important;
+}
+
+/* 其余元素只过渡自身可插值的颜色属性。
+   **不要在这里列自定义属性** —— 见上面的原因。 */
+html.theme-anim *,
+html.theme-anim *::before,
+html.theme-anim *::after {
+  transition:
+    background-color .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    background-image .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    border-color .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    color .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    fill .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    stroke .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    box-shadow .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    text-shadow .42s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    outline-color .42s var(--ease, cubic-bezier(.22, .61, .36, 1)) !important;
+  transition-delay: 0s !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.theme-anim,
+  html.theme-anim *,
+  html.theme-anim *::before,
+  html.theme-anim *::after {
+    transition: none !important;
+  }
+  #cosmos { transition: none; }
+}
+
+/* ============================================================
+   切换按钮
+   ============================================================ */
+
+.theme-toggle {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  padding: 0;
+  cursor: pointer;
+  color: var(--toggle-fg);
+  border: 1px solid var(--toggle-brd);
+  border-radius: 50%;
+  background: var(--toggle-bg);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: inset 0 1px 0 var(--toggle-hi);
+  transition:
+    color .3s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    background-color .3s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    border-color .3s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    box-shadow .3s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    transform .3s var(--ease, cubic-bezier(.22, .61, .36, 1));
+}
+.theme-toggle:hover {
+  color: var(--toggle-fg-hover);
+  background: var(--toggle-bg-hover);
+  border-color: var(--toggle-brd-hover);
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 var(--toggle-hi),
+    0 8px 22px -12px var(--toggle-glow);
+}
+/* 按下去要「陷」一下再弹回，这一下是手感的关键 */
+.theme-toggle:active { transform: translateY(0) scale(.93); }
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--toggle-brd-hover);
+  outline-offset: 3px;
+}
+
+/* 日/月图标交叉淡入：进来的从 -70° 转正，出去的转到 +70° 并缩小。
+   两个图标绝对定位叠在一起，所以按钮尺寸不随图标形状跳动。 */
+.theme-toggle svg {
+  position: absolute;
+  width: 17px;
+  height: 17px;
+  transition:
+    opacity .34s var(--ease, cubic-bezier(.22, .61, .36, 1)),
+    transform .44s var(--ease, cubic-bezier(.22, .61, .36, 1));
+}
+.theme-toggle .ti-sun { opacity: 1; transform: rotate(0) scale(1); }
+.theme-toggle .ti-moon { opacity: 0; transform: rotate(70deg) scale(.55); }
+
+[data-theme="light"] .theme-toggle .ti-sun { opacity: 0; transform: rotate(-70deg) scale(.55); }
+[data-theme="light"] .theme-toggle .ti-moon { opacity: 1; transform: rotate(0) scale(1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle svg { transition: opacity .2s linear; }
+  .theme-toggle .ti-sun,
+  .theme-toggle .ti-moon { transform: none !important; }
+  .theme-toggle:hover,
+  .theme-toggle:active { transform: none; }
+}
+
+/* 实验页（datawave / starflow / sheentalk）的顶栏更矮、更紧，
+   按钮跟着收一号，免得把 52px 的顶栏顶得发胀。 */
+.app-topbar .theme-toggle {
+  width: 32px;
+  height: 32px;
+}
+.app-topbar .theme-toggle svg { width: 15px; height: 15px; }
+
+/* 移动端导航：桌面端 .nav-toggle 是汉堡按钮（display:none 直到断点），
+   切换按钮始终可见。小屏上缩到 34px 以便与汉堡并排。 */
+@media (max-width: 860px) {
+  .nav-inner > .theme-toggle { width: 34px; height: 34px; margin-right: -6px; }
+  .nav-inner > .theme-toggle svg { width: 16px; height: 16px; }
+}
+
+/* 404 页没有顶栏，按钮挂在右上角。用 `body >` 限定，
+   免得误伤其他页面里嵌在头部容器内的同名按钮。 */
+body > .theme-toggle {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 5;
+}

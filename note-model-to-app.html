@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<script>/* 主题须在首帧前定下来，否则会先闪暗色再跳。默认暗色，不跟随系统。 */(function(){try{var t=localStorage.getItem("sheenova-theme");document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark");}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>从模型到应用，中间隔着什么 · 汐星札记</title>
+<meta name="description" content="一次 API 调用很快，真正让人愿意反复使用却是另一回事。企业级叫治理与集成，个人开发者叫 CORS、密钥、降级和额度。">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="汐星札记">
+<meta property="og:title" content="从模型到应用，中间隔着什么">
+<meta property="og:description" content="一次 API 调用很快，真正让人愿意反复使用却是另一回事。">
+<meta property="og:url" content="https://sheenova.cn/note-model-to-app.html">
+<meta property="og:image" content="https://sheenova.cn/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="notes.css">
+<link rel="stylesheet" href="theme.css?v=1">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="index.html"><span class="arrow">←</span> 回到首页</a>
+    <a class="brand-mini" href="index.html">汐星札记</a>
+<button class="theme-toggle" type="button" aria-label="切换到白天模式" aria-pressed="false">
+  <svg class="ti-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.1M12 19.3v2.1M2.6 12h2.1M19.3 12h2.1M5.4 5.4l1.5 1.5M17.1 17.1l1.5 1.5M18.6 5.4l-1.5 1.5M6.9 17.1l-1.5 1.5"/></svg>
+  <svg class="ti-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.6 14.7A8.7 8.7 0 1 1 9.3 3.4a6.9 6.9 0 0 0 11.3 11.3Z"/></svg>
+</button>
+  </div>
+</div>
+
+<article class="article">
+  <header class="article-head">
+    <p class="cat">学习</p>
+    <h1 class="article-title">从模型到应用，中间隔着什么</h1>
+    <div class="article-meta">
+      <span>2026.08.26</span>
+      <span>10 分钟阅读</span>
+    </div>
+    <p class="lede">一次 API 调用很快，真正让人愿意反复使用却是另一回事。</p>
+  </header>
+
+  <div class="body">
+
+    <p>把一个模型接口调通，说实话不难。填个地址，贴上密钥，写几行 fetch，回答就从控制台里跳出来了。第一次跑通的时候我还有点意外，就这？</p>
+
+    <p>然后是漫长的第二阶段。让它在一个真实的页面上、给真实的人用、并且一直能用。</p>
+
+    <p>我后来在一个技术博客上看到一句话，说得比我准：接入大模型这件事，降低了「用模型」的门槛，但没降低「用得好」的门槛。真正让人卡住的，不是模型能力，是接入、超时、跨域这些看起来琐碎的工程细节。</p>
+
+    <h2>隔着的东西，是有名字的</h2>
+
+    <p>今年陆续看到几组行业数据，讲的是同一件事：</p>
+
+    <div class="figures">
+      <h3>AI 项目从试点到生产</h3>
+      <ul>
+        <li><b>88%–92%</b> 的企业 AI 试点从未真正进入生产，成功规模化的只有 <b>8%–12%</b></li>
+        <li>demo 环境里准确率 <b>92%–98%</b>，接进真实、杂乱的数据后掉到 <b>62%–78%</b></li>
+        <li>失败最集中的环节不是「想法阶段」（仅 12%），而是<b>试点到生产之间</b>那一段（44%）</li>
+        <li><b>65%</b> 的已完成项目超出原定预算；约一半需要 3–6 个月才能交付</li>
+        <li>数据科学家有超过 <b>40%</b> 的时间花在数据准备上，而不是建模</li>
+      </ul>
+      <p class="source">数据综合自 2026 年多家机构的 AI 落地调查（OMMAX、Forrester / McKinsey 引用数据、CIO、TechTarget 等），各家口径不同，但量级一致。</p>
+    </div>
+
+    <p>失败原因那张表更说明问题：数据集成摩擦占 40%，投入产出算不清占 25%，组织阻力占 20%，模型漂移占 15%。</p>
+
+    <p>这里面没有一条是「模型不够聪明」。卡住的从来不是模型，是把模型接进一个真实系统这件事本身。</p>
+
+    <blockquote>
+      <p>试点回答的是：在设定好的条件下，这东西能不能行？</p>
+      <p>产品回答的是：在真实的约束下，它能不能一直行？</p>
+    </blockquote>
+
+    <h2>同一道题，换了个名字摆在我面前</h2>
+
+    <p>我做汐言的时候，没有 ERP，没有遗留系统，也没有跨部门扯皮。听起来该简单得多。</p>
+
+    <p>但那些卡住大公司的东西，换了个名字，一样摆在我面前。</p>
+
+    <p>服务可用性在我这儿叫「接口会挂」。免费模型有额度，公开接口会超时，访客自己填的密钥还可能填错。所以汐言最后做成了三层：先走访客自带的模型，其次调公开接口，再不行查本地知识库，最后用预设应答兜底。这个结构是一次次「又挂了」之后补出来的，不是一开始就设计好的。</p>
+
+    <p>系统集成在我这儿叫 CORS。这个坑几乎每个想在前端直连模型的人都踩过：页面和平台域名不同源，浏览器直接把请求拦下来，控制台里一行红字，<code>Access to fetch ... blocked by CORS policy</code>。跨源不是不能发，是对方得明确放行你的域名。有些模型接口放行了，有些没有。这件事在本地开发时完全看不出来，只有真正部署上去才会撞到。</p>
+
+    <p>密钥治理在我这儿叫「密钥不能写在前端」。前端代码是公开的，写进去的密钥等于公开。所以汐言只能让访客自己填、存在他自己的浏览器里，服务端一概不留。这是被逼出来的设计，不是什么高明选择。</p>
+
+    <p>成本模型在我这儿叫「一天五十次」。免费额度是有上限的，用完了就是完了。所以得在界面上把状态说清楚，而不是等它某天悄悄失效，用户还以为是坏了。</p>
+
+    <p>体验基线在我这儿叫「四秒」。接口不响应不能让人干等，四秒一到就放弃这次尝试，交给下一层。宁可给一个降级过的答案，也不要一个转不停的加载图标。</p>
+
+    <p>最后是合规。个人站点哪些地址要关、备案号怎么挂、哪些信息不能收。比如访客的位置，一个个人博客没有任何理由去要这个。</p>
+
+    <h2>一个具体的取舍</h2>
+
+    <p>这些里面最花时间、也最值得说的一个决定是：我给汐言定的第一目标不是「回答得准」，是<em>永不返回空白</em>。</p>
+
+    <p>听起来标准很低，做起来挺麻烦。它意味着每一层都必须有下一层接着，意味着任何一次失败都不能直接抛到界面上，意味着你得接受「这次答案没那么聪明，但至少是个答案」。</p>
+
+    <p>换个角度想一下就明白了：一个偶尔答得普通、但从不空白的东西，和一个聪明但经常转圈的东西，你会反复用哪个。我的判断是前者。</p>
+
+    <p>这也是那 44% 卡在试点和生产之间的项目最容易忽略的地方。真实用户对产品的印象，是由最差的那次决定的，不是最好的那次。</p>
+
+    <hr>
+
+    <p>所以「从模型到应用，中间隔着什么」，我现在会这么回答：</p>
+
+    <p>隔着的不是模型能力，是一整套关于失败的设计。接口挂了怎么办，慢了怎么办，超配额了怎么办，用户填错了怎么办，合规不允许怎么办。</p>
+
+    <p>在企业里，这套东西有正式的名字，叫治理，叫集成，叫变更管理，有专门的团队和预算。在个人项目里，它只是你一个人在半夜想「这里要是失败了会怎样」，然后多写几十行代码。</p>
+
+    <p>规模差了几个数量级，要解决的问题是同一个。</p>
+
+  </div>
+
+  <footer class="article-foot">
+    <p class="signature">写于 <strong>2026.08.26</strong> · 汐星札记</p>
+    <div class="next-links">
+      <a href="note-small-tools.html">← 上一篇：我为什么还在做这些小工具</a>
+      <a href="note-manual.html">下一篇：给未来的自己留一份使用说明 →</a>
+    </div>
+  </footer>
+</article>
+
+<script src="theme.js?v=1"></script>
+</body>
+</html>

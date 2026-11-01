@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<script>/* 主题须在首帧前定下来，否则会先闪暗色再跳。默认暗色，不跟随系统。 */(function(){try{var t=localStorage.getItem("sheenova-theme");document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark");}catch(e){}})();</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>汐言 SheenTalk · 汐星札记</title>
+  <meta name="description" content="汐言是汐星札记里的对话实验：把问题先问清楚，再决定下一步怎么做。不用配置也能答，接上模型就变强。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="汐星札记">
+  <meta property="og:title" content="汐言 SheenTalk · 汐星札记">
+  <meta property="og:description" content="先问清楚，再决定下一步怎么做。不用配置也能答，接上模型就变强。">
+  <meta property="og:url" content="https://sheenova.cn/sheentalk.html">
+  <meta property="og:image" content="https://sheenova.cn/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="sheentalk.css">
+<link rel="stylesheet" href="theme.css?v=1">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-topbar">
+      <a class="app-brand" href="index.html" aria-label="返回汐星札记首页">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none"><path d="M16 4.5 18.2 12l7.3 2.2-7.3 2.2L16 24l-2.2-7.6-7.3-2.2 7.3-2.2L16 4.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="25.5" cy="6" r="1.2" fill="currentColor"/></svg>
+        </span>
+        <span>
+          <strong>汐言</strong>
+          <small>SheenTalk · 汐星札记</small>
+        </span>
+      </a>
+      <div class="topbar-actions">
+<button class="theme-toggle" type="button" aria-label="切换到白天模式" aria-pressed="false">
+  <svg class="ti-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.1M12 19.3v2.1M2.6 12h2.1M19.3 12h2.1M5.4 5.4l1.5 1.5M17.1 17.1l1.5 1.5M18.6 5.4l-1.5 1.5M6.9 17.1l-1.5 1.5"/></svg>
+  <svg class="ti-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.6 14.7A8.7 8.7 0 1 1 9.3 3.4a6.9 6.9 0 0 0 11.3 11.3Z"/></svg>
+</button>
+        <span class="connection-state" id="connection-state"><i></i> 本地演示模式</span>
+        <button class="icon-button" id="settings-open" type="button" aria-label="打开设置" title="设置">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/><path d="m19 13.2 1.4 1.1-1.7 2.9-1.7-.7a7.5 7.5 0 0 1-1.8 1l-.3 1.8h-3.4l-.3-1.8a7.5 7.5 0 0 1-1.8-1l-1.7.7-1.7-2.9L7.4 13a7.5 7.5 0 0 1 0-2.1L6 9.8l1.7-2.9 1.7.7a7.5 7.5 0 0 1 1.8-1l.3-1.8h3.4l.3 1.8a7.5 7.5 0 0 1 1.8 1l1.7-.7 1.7 2.9-1.4 1.1a7.5 7.5 0 0 1 0 2.3Z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/></svg>
+        </button>
+        <a class="topbar-home" href="index.html">返回网站</a>
+      </div>
+    </header>
+
+    <main class="app-grid">
+      <aside class="session-panel" aria-label="会话列表">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">WORKSPACE</p>
+            <h1>我的会话</h1>
+          </div>
+          <button class="new-chat-button" id="new-chat" type="button" aria-label="新建会话" title="新建会话">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <label class="search-box">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="10.8" cy="10.8" r="5.8" stroke="currentColor" stroke-width="1.5"/><path d="m15.2 15.2 4.2 4.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span class="sr-only">搜索会话</span>
+          <input id="session-search" type="search" placeholder="搜索会话">
+        </label>
+        <div class="session-list" id="session-list"></div>
+        <div class="panel-footer">
+          <div class="privacy-note"><span></span><p>本地数据<br><b>只保存在当前浏览器</b></p></div>
+          <button class="text-button" id="clear-all" type="button">清空全部</button>
+        </div>
+      </aside>
+
+      <section class="chat-panel" aria-label="汐言对话">
+        <div class="chat-heading">
+          <div>
+            <p class="eyebrow">CURRENT THREAD</p>
+            <h2 id="thread-title">新的想法</h2>
+          </div>
+          <div class="thread-actions">
+            <button class="icon-button" id="rename-thread" type="button" aria-label="重命名会话" title="重命名">
+              <svg viewBox="0 0 24 24" fill="none"><path d="m14.5 5.5 4 4M5 19l2.8-.6L18.9 7.3a2.1 2.1 0 0 0-3-3L4.8 15.4 4.2 18.2 5 19Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="icon-button" id="clear-thread" type="button" aria-label="清空当前会话" title="清空当前会话">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M5 7h14M10 11v6M14 11v6M7.5 7l.7 12h7.6l.7-12M9 7l.8-2h4.4l.8 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="conversation" id="conversation" aria-live="polite"></div>
+        <div class="composer-wrap">
+          <div class="quick-actions" id="quick-actions">
+            <button type="button" data-prompt="北京今天天气怎么样？">查天气</button>
+            <button type="button" data-prompt="你最近在研究什么方向？">最近在关注什么</button>
+            <button type="button" data-prompt="帮我把这个想法整理成一份清晰的产品方案。">整理产品方案</button>
+            <button type="button" data-prompt="请用通俗的语言解释一个 AI 概念，并举例说明。">解释 AI 概念</button>
+            <button type="button" data-prompt="帮我把一个大任务拆成今天可以开始执行的步骤。">拆解任务</button>
+          </div>
+          <form class="composer" id="composer">
+            <textarea id="message-input" rows="1" maxlength="4000" placeholder="和汐言聊点什么..." autocomplete="off"></textarea>
+            <div class="composer-toolbar">
+              <div class="composer-tools">
+                <button class="tool-button" id="voice-input" type="button" aria-label="语音输入" title="语音输入">
+                  <svg viewBox="0 0 24 24" fill="none"><rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </button>
+                <span class="composer-hint">Enter 发送 · Shift + Enter 换行</span>
+              </div>
+              <button class="send-button" id="send-button" type="submit" aria-label="发送消息" title="发送消息">
+                <svg viewBox="0 0 24 24" fill="none"><path d="m4 4 16 8-16 8 3-8-3-8Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M7 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </form>
+          <p class="composer-disclaimer">汐言可能会产生不准确的信息，请在重要场景中自行核验。</p>
+        </div>
+      </section>
+
+      <aside class="inspector-panel" aria-label="汐言能力面板">
+        <div class="inspector-intro">
+          <div class="assistant-orbit" aria-hidden="true"><span></span><b>汐</b></div>
+          <p class="eyebrow">SHEENTALK</p>
+          <h2>让想法<br><em>流动起来</em></h2>
+          <p>从一个模糊念头开始，一起把它变成清晰的下一步。</p>
+        </div>
+        <div class="capability-list">
+          <div><span class="capability-icon">01</span><p><b>思考</b><small>梳理复杂问题</small></p></div>
+          <div><span class="capability-icon">02</span><p><b>创作</b><small>写作与内容生成</small></p></div>
+          <div><span class="capability-icon">03</span><p><b>行动</b><small>任务拆解与规划</small></p></div>
+        </div>
+        <div class="model-card">
+          <p class="eyebrow">MODEL</p>
+          <div><span class="model-dot"></span><b id="model-label">Local Demo</b><span class="model-arrow">⌄</span></div>
+          <small id="model-subtitle">回复由浏览器本地模拟</small>
+        </div>
+        <div class="inspector-tip">
+          <span>⌁</span>
+          <p>试试把一个还不成熟的想法交给汐言，先从说出来开始。</p>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <div class="settings-drawer" id="settings-drawer" aria-hidden="true">
+    <div class="drawer-backdrop" data-close-settings></div>
+    <section class="drawer" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <div class="drawer-heading">
+        <div><p class="eyebrow">CONNECTION</p><h2 id="settings-title">接入设置</h2></div>
+        <button class="icon-button" type="button" data-close-settings aria-label="关闭设置" title="关闭设置">
+          <svg viewBox="0 0 24 24" fill="none"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <p class="drawer-description">默认使用本地应答：知识库检索与实时数据查询都在你自己的浏览器里完成，不会把你的输入发送到任何地方。填写兼容 OpenAI Chat Completions 的接口后，可以连接你自己的模型服务。</p>
+      <form id="settings-form" class="settings-form">
+        <label>接口地址<input id="api-endpoint" type="url" placeholder="https://api.example.com/v1/chat/completions"></label>
+        <label>模型名称<input id="api-model" type="text" placeholder="gpt-4o-mini"></label>
+        <label>API Key <span class="optional">可选</span><input id="api-key" type="password" placeholder="仅保存在当前浏览器"></label>
+        <div class="settings-note">提示：浏览器直连模型服务可能遇到跨域限制。正式部署建议通过自己的服务端代理请求。</div>
+        <button class="text-button" id="clear-settings" type="button">清除已保存的接口地址与密钥</button>
+        <div class="drawer-actions">
+          <button class="secondary-button" type="button" data-close-settings>取消</button>
+          <button class="primary-button" type="submit">保存设置</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="sheentalk.js"></script>
+<script src="theme.js?v=1"></script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<script>/* 主题须在首帧前定下来，否则会先闪暗色再跳。默认暗色，不跟随系统。 */(function(){try{var t=localStorage.getItem("sheenova-theme");document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark");}catch(e){}})();</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>星潮 AgentFlow · 汐星札记</title>
+  <meta name="description" content="星潮是汐星札记里的流程实验：练习把一个目标拆成几个小步骤，让不同角色的 AI 接力完成。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="汐星札记">
+  <meta property="og:title" content="星潮 AgentFlow · 汐星札记">
+  <meta property="og:description" content="练习把一个目标拆成几个小步骤，让不同角色的 AI 接力完成。">
+  <meta property="og:url" content="https://sheenova.cn/starflow.html">
+  <meta property="og:image" content="https://sheenova.cn/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="starflow.css">
+<link rel="stylesheet" href="theme.css?v=1">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-topbar">
+      <a class="app-brand" href="index.html" aria-label="返回汐星札记首页">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none"><path d="M16 4.5 18.2 12l7.3 2.2-7.3 2.2L16 24l-2.2-7.6-7.3-2.2 7.3-2.2L16 4.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="25.5" cy="6" r="1.2" fill="currentColor"/></svg>
+        </span>
+        <span>
+          <strong>星潮</strong>
+          <small>AgentFlow · 汐星札记</small>
+        </span>
+      </a>
+      <div class="topbar-center"><span class="status-dot"></span><span id="save-state">本地草稿</span></div>
+      <div class="topbar-actions">
+<button class="theme-toggle" type="button" aria-label="切换到白天模式" aria-pressed="false">
+  <svg class="ti-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.1M12 19.3v2.1M2.6 12h2.1M19.3 12h2.1M5.4 5.4l1.5 1.5M17.1 17.1l1.5 1.5M18.6 5.4l-1.5 1.5M6.9 17.1l-1.5 1.5"/></svg>
+  <svg class="ti-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.6 14.7A8.7 8.7 0 1 1 9.3 3.4a6.9 6.9 0 0 0 11.3 11.3Z"/></svg>
+</button>
+        <button class="icon-button" id="reset-flow" type="button" aria-label="重置流程" title="重置流程">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 7v5h5M5.5 12a7 7 0 1 0 2-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <a class="topbar-home" href="index.html">返回网站</a>
+      </div>
+    </header>
+
+    <section class="page-intro">
+      <p class="eyebrow">PRODUCT 02 · EXPERIMENT</p>
+      <h2 class="intro-title">星潮 <span class="grad">AgentFlow</span></h2>
+      <p class="intro-tag">智能体流程草图</p>
+      <p class="intro-desc">我用它练习把一个目标拆成几个小步骤，让不同角色的 AI 接力完成。下面是可以直接上手的工作台：从左侧添加节点，在右侧设置每个节点的角色，点「运行流程」看它们按顺序接力。</p>
+      <ul class="intro-chips"><li>可视化编排</li><li>系统集成</li><li>过程可观测</li></ul>
+    </section>
+
+    <main class="flow-layout">
+      <aside class="flow-sidebar">
+        <div class="sidebar-heading">
+          <div><p class="eyebrow">WORKSPACE</p><h1>我的流程</h1></div>
+          <button class="new-flow-button" id="new-flow" type="button" aria-label="新建流程" title="新建流程">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <div class="flow-name-wrap">
+          <label for="flow-name">当前草稿</label>
+          <input id="flow-name" value="内容研究助手" maxlength="32">
+        </div>
+        <div class="saved-flow-list" id="saved-flow-list"></div>
+        <div class="palette">
+          <div class="palette-heading"><p class="eyebrow">NODE PALETTE</p><span>点击添加</span></div>
+          <button class="palette-item" type="button" data-add-node="agent"><span class="palette-icon agent-icon">AI</span><span><b>智能体</b><small>理解并生成内容</small></span><i>+</i></button>
+          <button class="palette-item" type="button" data-add-node="tool"><span class="palette-icon tool-icon">◎</span><span><b>工具调用</b><small>连接一个外部动作</small></span><i>+</i></button>
+          <button class="palette-item" type="button" data-add-node="router"><span class="palette-icon router-icon">↗</span><span><b>条件分流</b><small>根据结果选择路径</small></span><i>+</i></button>
+          <button class="palette-item" type="button" data-add-node="review"><span class="palette-icon review-icon">人</span><span><b>人工确认</b><small>把决定交给自己</small></span><i>+</i></button>
+        </div>
+        <div class="sidebar-note"><span>⌁</span><p>先把流程跑通，再考虑接入真实模型和工具。</p></div>
+      </aside>
+
+      <section class="flow-workspace" aria-label="星潮流程画布">
+        <div class="workspace-heading">
+          <div><p class="eyebrow">FLOW CANVAS</p><h2 id="canvas-title">内容研究助手</h2><p>把一个目标拆成几个可以交接的小步骤。</p></div>
+          <div class="workspace-actions">
+            <span class="run-state" id="run-state"><i></i>准备就绪</span>
+            <button class="run-button" id="run-flow" type="button"><span class="run-symbol">▶</span>运行流程</button>
+          </div>
+        </div>
+        <div class="canvas-shell">
+          <div class="canvas-toolbar">
+            <span><b id="node-count">0</b> 个节点</span>
+            <span>本地模拟 · 自动保存</span>
+          </div>
+          <div class="flow-canvas" id="flow-canvas"></div>
+          <div class="canvas-empty" id="canvas-empty" hidden>
+            <div class="empty-orbit">+</div>
+            <h3>从一个节点开始</h3>
+            <p>点击左侧节点类型，把你的第一个流程搭起来。</p>
+          </div>
+        </div>
+      </section>
+
+      <aside class="inspector-panel" aria-label="节点配置">
+        <div class="inspector-heading"><div><p class="eyebrow">NODE INSPECTOR</p><h2>节点设置</h2></div><span class="inspector-index" id="inspector-index">01</span></div>
+        <div class="inspector-empty" id="inspector-empty"><div class="empty-orbit small">⌁</div><p>选择画布中的节点<br>开始编辑它的角色。</p></div>
+        <form class="node-form" id="node-form" hidden>
+          <div class="selected-node-preview" id="selected-node-preview"></div>
+          <label>节点名称<input id="node-label" maxlength="28"></label>
+          <label>节点角色<select id="node-type"><option value="agent">智能体</option><option value="tool">工具调用</option><option value="router">条件分流</option><option value="review">人工确认</option></select></label>
+          <label>任务说明<textarea id="node-prompt" rows="5" maxlength="300"></textarea></label>
+          <label class="toggle-row"><span><b>启用节点</b><small>运行时会执行这个步骤</small></span><input id="node-enabled" type="checkbox"><i></i></label>
+          <button class="delete-node" id="delete-node" type="button">删除这个节点</button>
+        </form>
+        <div class="inspector-footer"><span class="status-dot"></span><span>所有改动只保存在当前浏览器</span></div>
+      </aside>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="starflow.js"></script>
+<script src="theme.js?v=1"></script>
+</body>
+</html>

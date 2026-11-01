@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>汐星札记</title>
+    <link>https://sheenova.cn/</link>
+    <description>一个人的 AI 学习、实验与生活记录</description>
+    <language>zh-CN</language>
+    <managingEditor>huxleystars@foxmail.com (Huxleystars)</managingEditor>
+    <atom:link href="https://sheenova.cn/feed.xml" rel="self" type="application/rss+xml"/>
+
+    <item>
+      <title>我为什么还在做这些小工具</title>
+      <link>https://sheenova.cn/note-small-tools.html</link>
+      <guid isPermaLink="true">https://sheenova.cn/note-small-tools.html</guid>
+      <pubDate>Tue, 08 Sep 2026 00:00:00 +0800</pubDate>
+      <category>观察</category>
+      <description>工具不一定要改变世界，先让今天的一个动作变得顺一点。做小工具的过程，往往比工具本身更值。</description>
+    </item>
+
+    <item>
+      <title>从模型到应用，中间隔着什么</title>
+      <link>https://sheenova.cn/note-model-to-app.html</link>
+      <guid isPermaLink="true">https://sheenova.cn/note-model-to-app.html</guid>
+      <pubDate>Wed, 26 Aug 2026 00:00:00 +0800</pubDate>
+      <category>学习</category>
+      <description>一次 API 调用很快，真正让人愿意反复使用却是另一回事。企业级叫治理与集成，个人开发者叫 CORS、密钥、降级和额度。</description>
+    </item>
+
+    <item>
+      <title>给未来的自己留一份使用说明</title>
+      <link>https://sheenova.cn/note-manual.html</link>
+      <guid isPermaLink="true">https://sheenova.cn/note-manual.html</guid>
+      <pubDate>Tue, 11 Aug 2026 00:00:00 +0800</pubDate>
+      <category>随想</category>
+      <description>记录不是为了显得完整，而是为了下次重新开始时少绕一点路。写给三个月后那个什么都不记得的自己。</description>
+    </item>
+
+  </channel>
+</rss>

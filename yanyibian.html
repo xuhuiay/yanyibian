@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<script>/* 主题须在首帧前定下来，否则会先闪暗色再跳。默认暗色，不跟随系统。 */(function(){try{var t=localStorage.getItem("sheenova-theme");document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark");}catch(e){}})();</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>验一遍 YanYiBian · 汐星札记</title>
+  <meta name="description" content="验一遍是一个 AI 产出交付前的自检实验：贴一段要交出去的文字，按模板检查格式、要素覆盖、长度、语气、禁用项和事实一致性，并把有问题的地方标出来。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="汐星札记">
+  <meta property="og:title" content="验一遍 YanYiBian · 汐星札记">
+  <meta property="og:description" content="贴一段要交出去的文字，看看它缺了什么、哪里说过了头。">
+  <meta property="og:url" content="https://sheenova.cn/yanyibian.html">
+  <meta property="og:image" content="https://sheenova.cn/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="yanyibian.css">
+<link rel="stylesheet" href="theme.css?v=1">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-topbar">
+      <a class="app-brand" href="index.html" aria-label="返回汐星札记首页">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none"><path d="M16 4.5 18.2 12l7.3 2.2-7.3 2.2L16 24l-2.2-7.6-7.3-2.2 7.3-2.2L16 4.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="25.5" cy="6" r="1.2" fill="currentColor"/></svg>
+        </span>
+        <span>
+          <strong>验一遍</strong>
+          <small>YanYiBian · 汐星札记</small>
+        </span>
+      </a>
+      <div class="topbar-center"><span class="status-dot"></span><span id="engine-state">本地规则引擎 · 不联网</span></div>
+      <div class="topbar-actions">
+<button class="theme-toggle" type="button" aria-label="切换到白天模式" aria-pressed="false">
+  <svg class="ti-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.1M12 19.3v2.1M2.6 12h2.1M19.3 12h2.1M5.4 5.4l1.5 1.5M17.1 17.1l1.5 1.5M18.6 5.4l-1.5 1.5M6.9 17.1l-1.5 1.5"/></svg>
+  <svg class="ti-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.6 14.7A8.7 8.7 0 1 1 9.3 3.4a6.9 6.9 0 0 0 11.3 11.3Z"/></svg>
+</button>
+        <a class="topbar-repo" href="https://github.com/xuhuiay/验一遍" target="_blank" rel="noopener noreferrer" aria-label="在 GitHub 打开本项目仓库">
+          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
+        <a class="topbar-home" href="index.html">返回网站</a>
+      </div>
+    </header>
+
+    <section class="page-intro">
+      <p class="eyebrow">EXPERIMENT 04 · 交付前自检</p>
+      <h2 class="intro-title">验一遍 <span class="grad">YanYiBian</span></h2>
+      <p class="intro-tag">AI 写完之后，先自己查一遍</p>
+      <p class="intro-desc">把 AI 写好的周报、通知或项目说明贴进来，选一个模板，它会按那套约束逐条检查：格式对不对、要素齐不齐、有没有超长、语气是不是说过了头、有没有该避开的套话，以及那些没有出处的数字。有问题的地方直接标在原文上。规则全部在浏览器里跑，文字不会离开这台设备。</p>
+      <ul class="intro-chips"><li>六类约束</li><li>缺陷定位到句</li><li>纯前端 · 无后端</li></ul>
+    </section>
+
+    <main class="data-layout">
+      <aside class="data-sidebar">
+        <div class="sidebar-heading"><div><p class="eyebrow">TEMPLATES</p><h1>约束模板</h1></div><span class="dataset-count">4</span></div>
+        <div class="dataset-list" id="template-list"></div>
+        <div class="history-heading"><p class="eyebrow">SAMPLES</p><button id="clear-sample" type="button">清空</button></div>
+        <div class="question-history" id="sample-list"></div>
+        <div class="sidebar-note"><span>⌁</span><p>这里的判断来自固定规则，不是模型推理：同样的文字每次结论一致，也说得清是哪一条不满足。</p></div>
+      </aside>
+
+      <section class="data-workspace" aria-label="验一遍文本校验">
+        <div class="workspace-heading">
+          <div><p class="eyebrow">CHECK BEFORE DELIVERY</p><h2>贴一段要交出去的文字</h2><p id="template-desc">按模板逐条比对，把有问题的地方标出来。</p></div>
+          <label class="dataset-select"><span>当前模板</span><select id="template-select"></select></label>
+        </div>
+
+        <div class="query-wrap">
+          <form class="query-box" id="check-form">
+            <textarea id="text-input" rows="9" placeholder="例如：本周完成了数据采集脚本的重构，下周计划补充 30 条试点记录……"></textarea>
+            <div class="query-toolbar"><span id="char-count">0 字 · 本地校验 · 不上传</span><button class="ask-button" id="check-button" type="submit"><span>↗</span>开始校验</button></div>
+          </form>
+          <div class="example-questions" id="example-samples"></div>
+        </div>
+
+        <div class="result-area" id="result-area" aria-live="polite">
+          <div class="result-empty"><div class="empty-orbit">⌁</div><h3>贴一段文字，看看它缺了什么</h3><p>不需要懂规则：选模板、贴文本、点校验，缺陷会标在原文上。</p></div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="yanyibian.js"></script>
+<script src="theme.js?v=1"></script>
+</body>
+</html>

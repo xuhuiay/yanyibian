@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<script>/* 主题须在首帧前定下来，否则会先闪暗色再跳。默认暗色，不跟随系统。 */(function(){try{var t=localStorage.getItem("sheenova-theme");document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark");}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我为什么还在做这些小工具 · 汐星札记</title>
+<meta name="description" content="工具不一定要改变世界，先让今天的一个动作变得顺一点。做小工具的过程，往往比工具本身更值。">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="汐星札记">
+<meta property="og:title" content="我为什么还在做这些小工具">
+<meta property="og:description" content="工具不一定要改变世界，先让今天的一个动作变得顺一点。">
+<meta property="og:url" content="https://sheenova.cn/note-small-tools.html">
+<meta property="og:image" content="https://sheenova.cn/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="notes.css">
+<link rel="stylesheet" href="theme.css?v=1">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="index.html"><span class="arrow">←</span> 回到首页</a>
+    <a class="brand-mini" href="index.html">汐星札记</a>
+<button class="theme-toggle" type="button" aria-label="切换到白天模式" aria-pressed="false">
+  <svg class="ti-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.1M12 19.3v2.1M2.6 12h2.1M19.3 12h2.1M5.4 5.4l1.5 1.5M17.1 17.1l1.5 1.5M18.6 5.4l-1.5 1.5M6.9 17.1l-1.5 1.5"/></svg>
+  <svg class="ti-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.6 14.7A8.7 8.7 0 1 1 9.3 3.4a6.9 6.9 0 0 0 11.3 11.3Z"/></svg>
+</button>
+  </div>
+</div>
+
+<article class="article">
+  <header class="article-head">
+    <p class="cat">观察</p>
+    <h1 class="article-title">我为什么还在做这些小工具</h1>
+    <div class="article-meta">
+      <span>2026.09.08</span>
+      <span>6 分钟阅读</span>
+    </div>
+    <p class="lede">工具不一定要改变世界，先让今天的一个动作变得顺一点。</p>
+  </header>
+
+  <div class="body">
+
+    <p>这个站上有三个小东西：汐言、星潮、澜图。都不大，也都没打算改变世界。</p>
+
+    <p>有人问过我，现成工具那么多，为什么还要自己写。我想了一下，答案挺朴素的：因为我需要的那东西，市面上要么太重，要么刚好差一点。</p>
+
+    <p>先说汐言。</p>
+
+    <p>我想要一个能回答「这个站上到底写了什么」的东西。听起来不复杂。试了几个现成方案，要么得先注册、再配置、再等它把内容索引完，要么就是个通用聊天框，问它站上的事，它一脸茫然地开始编。</p>
+
+    <p>后来自己写了一个。现在是三层：先走访客自己填的模型接口，其次调公开接口，再不行查我写在代码里的知识库，最后用几句预设的话兜底。</p>
+
+    <p>这三层不是设计出来的。第一版只有模型那一层，连不上就什么都不显示，页面上干干净净，干净得让人心慌。后来加公开接口，后来加知识库，最后连兜底也补上。现在不管问什么，它至少都会回你点什么，哪怕答得一般。</p>
+
+    <h2>为自己做，省掉了最难的那一步</h2>
+
+    <p>我看到过一个做独立开发的人写的句子，大意是：好工具往往不是从宏大愿景开始的，是从一次具体的烦躁开始的。</p>
+
+    <p>你被某个流程烦到了，去找现成的方案，发现不合适，于是自己动手。这个过程里，你其实跳过了产品开发里最难的一段：想清楚到底要做什么。</p>
+
+    <p>不用做用户访谈，不用猜需求，不用纠结「用户会不会想要这个功能」。你自己就是用户，你知道哪里别扭，因为你每天都在撞它。</p>
+
+    <p>那位开发者还给过一条筛选标准，我觉得挺管用：如果我不会每天都用，我就不做。这句话帮我挡掉过不少「听起来很酷但没人会打开第二次」的想法。</p>
+
+    <h2>省下的时间会攒起来</h2>
+
+    <p>单独看，一个小工具每次省的可能是几秒。</p>
+
+    <p>我见过一个粗略的算法：花八小时写出来的工具，如果每次能省八到十分钟，那么用不到六十次就把开发时间赚回来了。在高频场景里，六十次可能只是几周的事。</p>
+
+    <p>不过更实在的收益其实在注意力上。每次在几个窗口之间切换、复制、粘贴、手动改格式，都在悄悄消耗一点注意力。少一个这样的动作，一天下来脑子会清爽一点。这种事单次几乎察觉不到，一天几百次累积起来是能感觉到的。</p>
+
+    <h2>做的过程比做出来的东西值</h2>
+
+    <p>说实话，这三个小工具本身带给我的，可能还不如做它们的过程给的多。</p>
+
+    <p>做汐言的时候我才真正弄明白浏览器的同源策略卡在哪。为什么有些模型接口可以直连，有些就是过不去。为什么密钥绝对不能写在能被人看到的地方，所以只能让访客自己填、存在他自己的浏览器里，服务端一概不留。</p>
+
+    <p>给站点办备案的时候，我才知道一台 2 核 2G 的服务器装不了 MySQL 8.0。宝塔弹了句「至少需要 4000MB 内存才能安装」，我以为是句保守估计，去查了一下发现是真的：8.0 的门槛是 <code>3700MB</code>，我只有 <code>2048MB</code>，差 1.6GB。顺带查到 5.7 要 1560MB，5.6 只要 768MB。</p>
+
+    <p>这些数字，不亲手撞一次是记不住的。它们也不会出现在任何一个工具的界面上，但留在我脑子里了。</p>
+
+    <hr>
+
+    <p>所以如果有人再问我为什么做这些，我大概会说：因为它们让今天的某个动作顺了一点，顺便让我多知道了点东西。</p>
+
+    <p>工具不一定要改变世界。先让今天顺一点，就挺好。</p>
+
+  </div>
+
+  <footer class="article-foot">
+    <p class="signature">写于 <strong>2026.09.08</strong> · 汐星札记</p>
+    <div class="next-links">
+      <a href="note-model-to-app.html">下一篇：从模型到应用，中间隔着什么 →</a>
+    </div>
+  </footer>
+</article>
+
+<script src="theme.js?v=1"></script>
+</body>
+</html>

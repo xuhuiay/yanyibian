@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<script>/* 主题须在首帧前定下来，否则会先闪暗色再跳。默认暗色，不跟随系统。 */(function(){try{var t=localStorage.getItem("sheenova-theme");document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark");}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>页面未找到 · 汐星札记</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#5B86FF; --aqua:#6FE3E8; --violet:#BB8CFF;
+    --ink:#E8EDFB; --muted:rgba(232,237,251,.62);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; display:grid; place-items:center; padding:32px;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, rgba(91,134,255,.16), transparent 60%),
+      radial-gradient(900px 500px at 90% 110%, rgba(187,140,255,.12), transparent 60%),
+      linear-gradient(180deg,var(--bg-stop-1) 0%,var(--bg-stop-2) 50%,var(--bg-stop-3) 100%);
+    color:var(--ink);
+    font-family:'Noto Sans SC',system-ui,-apple-system,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .card{
+    position:relative; max-width:560px; width:100%; text-align:center;
+    padding:56px 44px; border-radius:26px;
+    background:rgba(var(--ovl-rgb),.045);
+    border:1px solid rgba(var(--ovl-rgb),.1);
+    box-shadow:0 24px 60px rgba(2,6,24,.5), inset 0 1px 0 rgba(255,255,255,.08);
+    backdrop-filter:blur(20px) saturate(160%);
+    -webkit-backdrop-filter:blur(20px) saturate(160%);
+  }
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    .card{background:var(--fallback-panel)}
+  }
+  .mark{width:44px;height:32px;margin:0 auto 22px;display:block}
+  .code{
+    font-family:'Noto Serif SC',serif; font-weight:700;
+    font-size:76px; line-height:1; letter-spacing:.04em; margin:0 0 14px;
+    background:linear-gradient(100deg,var(--blue) 0%,var(--aqua) 55%,var(--violet) 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  h1{font-family:'Noto Serif SC',serif; font-weight:600; font-size:22px; letter-spacing:.02em; margin:0 0 10px}
+  p{color:var(--muted); font-size:14px; line-height:1.9; margin:0 0 30px}
+  .links{display:flex; gap:10px; flex-wrap:wrap; justify-content:center}
+  a.btn{
+    display:inline-block; padding:11px 22px; border-radius:999px;
+    font-size:13.5px; text-decoration:none; color:var(--ink);
+    border:1px solid rgba(var(--ovl-rgb),.14);
+    background:rgba(var(--ovl-rgb),.05);
+    transition:border-color .25s, background .25s, transform .25s;
+  }
+  a.btn:hover{border-color:rgba(111,227,232,.5); background:rgba(111,227,232,.09); transform:translateY(-1px)}
+  a.btn.primary{border-color:transparent; background:linear-gradient(100deg,var(--blue),var(--violet)); color:#fff}
+  a.btn.primary:hover{opacity:.9}
+  @media (max-width:520px){
+    .card{padding:44px 26px}
+    .code{font-size:60px}
+  }
+</style>
+<link rel="stylesheet" href="theme.css?v=1">
+</head>
+<body>
+  <main class="card">
+    <svg class="mark" viewBox="0 0 44 32" fill="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="lg" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#5B86FF"/>
+          <stop offset=".55" stop-color="#6FE3E8"/>
+          <stop offset="1" stop-color="#BB8CFF"/>
+        </linearGradient>
+      </defs>
+      <path d="M3 24 C 9 16, 15 16, 21 22 S 29 28, 33 20" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M31 3 L32.5 8.5 L38 10 L32.5 11.5 L31 17 L29.5 11.5 L24 10 L29.5 8.5 Z" fill="url(#lg)"/>
+    </svg>
+    <p class="code">404</p>
+    <h1>这片星域还没有被点亮</h1>
+    <p>你要找的页面不存在，或者已经搬去了别处。<br>回到首页看看吧。</p>
+    <div class="links">
+      <a class="btn primary" href="/">返回首页</a>
+      <a class="btn" href="/sheentalk.html">汐言</a>
+      <a class="btn" href="/starflow.html">星潮</a>
+      <a class="btn" href="/datawave.html">澜图</a>
+    </div>
+    <button class="theme-toggle" type="button" aria-label="切换到白天模式" aria-pressed="false">
+    <svg class="ti-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.1M12 19.3v2.1M2.6 12h2.1M19.3 12h2.1M5.4 5.4l1.5 1.5M17.1 17.1l1.5 1.5M18.6 5.4l-1.5 1.5M6.9 17.1l-1.5 1.5"/></svg>
+    <svg class="ti-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.6 14.7A8.7 8.7 0 1 1 9.3 3.4a6.9 6.9 0 0 0 11.3 11.3Z"/></svg>
+  </button>
+</main>
+<script src="theme.js?v=1"></script>
+</body>
+</html>
