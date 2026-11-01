@@ -41,7 +41,8 @@ $env:YYB_AI_MODEL="gpt-4o-mini"
 | --- | --- | --- |
 | `YYB_API_ADDR` | `127.0.0.1:8788` | 监听地址 |
 | `YYB_API_TOKEN` | 无 | 鉴权 token；未设且未开 `ALLOW_ANON` 时**拒绝启动**（exit 2） |
-| `YYB_API_ALLOW_ANON` | `false` | `1/true/yes` 时允许无 token |
+| `YYB_API_ALLOW_ANON` | `false` | `1/true/yes` 时允许无 token（**只对回环监听生效**） |
+| `YYB_API_ALLOW_REMOTE` | `false` | `1/true/yes` 时允许监听非回环地址（仍必须设 token，否则拒绝启动） |
 | `YYB_API_RATE` | `30` | 每分钟请求上限（全局固定窗口，不按 token 分桶） |
 | `YYB_AI_PROVIDER` | `custom` | 仅作文档标记，随响应返回 |
 | `YYB_AI_BASE` | `https://api.openai.com/v1` | OpenAI 兼容 base_url；**明文 http 只允许 localhost/127.0.0.1/[::1]** |
@@ -279,7 +280,7 @@ data = r.json()
 ## 8. 安全与隐私
 
 - **Key 不落盘**：只从环境变量读进 `Mutex<Option<String>>`，`/v1/health` 只回 `hasKey`，不回明文。
-- **默认只监听回环**：`127.0.0.1:8788`；改监听非本机地址必须设 token，否则拒绝启动。
+- **默认只监听回环**：`127.0.0.1:8788`；回环范围内（`127.0.0.0/8`、`::1`、`localhost`）换端口可直接跑；对外监听（如 `0.0.0.0:8788`）要显式 `YYB_API_ALLOW_REMOTE=1`，且必须设 token，否则**启动即拒绝**（exit 2）。
 - **无请求日志**：服务端只打印监听地址与限流参数；不记录正文、不落缓存、不写历史。
 - **外发内容最小**：只发送正文 + 模板 id + 已命中缺陷标签（`build_prompt`），不发送文件路径、不发送无关元数据（mock 记录 `leaksPath=false`）。
 - **不联网即可用**：不开 AI 时零外联，响应仍是完整的规则结论。
@@ -301,16 +302,20 @@ data = r.json()
 
 ---
 
-## 10. 待裁定
+## 10. 已裁定的默认方案（v1.10）
 
-| ID | 问题 | 现状 |
-| --- | --- | --- |
-| Q-40 | 鉴权是否升级为多 token / 签名（HMAC） | 目前单 token |
-| Q-41 | 是否允许监听 0.0.0.0（当前需 token，但仍是明文） | 仅提示风险 |
-| Q-42 | 限流是否按 token/IP 分桶 | 全局单桶 |
-| Q-43 | 是否返回规则命中（`includeRules` 默认值） | 默认 `true` |
-| Q-44 | 字段命名是否统一 camelCase（当前已是 camelCase，除 `code`/`message` 沿用） | 待确认 |
-| Q-45 | 是否需要流式（SSE）返回 | 未实现 |
+v1.9 列的 6 项「待裁定」已按**默认 / 最小改动**方案定下，代码与文档同步。今后若要改，改这一节并升文档版本；不再逐项等待确认。
+
+| ID | 事项 | 采用的默认值 | 依据 | 落在哪里 |
+| --- | --- | --- | --- | --- |
+| Q-40 | 鉴权是否升级（多 token / HMAC 签名） | **不升级**：单静态 token，`Authorization: Bearer <token>`（也接受裸 token） | 单机自用场景；多 token 需配套分发/轮换，收益不抵复杂度 | `src-tauri/src/api.rs` `authorized()` |
+| Q-41 | 是否允许监听 0.0.0.0 | **默认只允许回环**（`127.0.0.0/8`、`::1`、`localhost`）；确需对外时显式 `YYB_API_ALLOW_REMOTE=1`，且**必须设 token**（`YYB_API_ALLOW_ANON` 只对回环生效） | 安全默认优先，同时保留显式逃逸开关；v1.9 只提示风险，v1.10 改为启动即拒 | `src-tauri/src/bin/yyb_api.rs` `is_loopback_addr()` + 启动检查 |
+| Q-42 | 限流是否按 token/IP 分桶 | **全局单桶**：固定窗口 60 s，默认 30 次/分钟 | 单进程自用；多租户应由前置网关做 | `src-tauri/src/api.rs` `rate_ok()` |
+| Q-43 | `includeRules` 默认值 | **`true`**（一次调用同时拿规则命中与 AI 建议） | 规则判定才是结论来源；只要 AI 建议可显式传 `false` | `src-tauri/src/api.rs` `handle_points()` |
+| Q-44 | 字段命名是否统一 camelCase | **统一 camelCase**（`apiVersion` / `points[].start` / `review.after` …）；`error.code`、`error.message` 保持既有写法 | 现状已是 camelCase，改成别的只增加破坏面 | `src-tauri/src/api.rs` 全部响应构造 |
+| Q-45 | 是否需要流式（SSE）返回 | **不实现**：单次同步返回；长文本靠 `YYB_AI_TIMEOUT_MS`（默认 20000 ms）控制 | 单次 2–20 s 量级，SSE 需改造客户端读端，收益有限 | —（未实现，维持 v1.9） |
+
+**由此产生的行为变化（仅一条）**：v1.9 用 token 就能监听 `0.0.0.0`；v1.10 起必须再加 `YYB_API_ALLOW_REMOTE=1`，否则拒绝启动（exit 2，中文提示写明怎么开）。其余 5 项与 v1.9 行为一致，只是写清了默认值。
 
 ---
 
@@ -319,3 +324,4 @@ data = r.json()
 | 版本 | 日期 | 变更 |
 | --- | --- | --- |
 | v1.9 | 2026-11-01 | 新增 `yyb-api`（`GET /v1/health`、`POST /v1/points`），复用 `ai::revise_blocking` 与内核判定；规则版本仍 `yyb-4`，593 例门禁不变 |
+| v1.10 | 2026-11-01 | 6 项「待裁定」按默认方案落地：新增 `YYB_API_ALLOW_REMOTE` 开关（默认只回环，对外须显式开启且必须有 token）；其余 5 项维持现状并写入 §10 默认表 |

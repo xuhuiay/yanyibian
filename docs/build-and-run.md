@@ -211,7 +211,7 @@ docx 走 `src-tauri/src/docx.rs`：只读 `word/document.xml`，每个 `<w:p>` �
 
 **判定口径未变**：壳页只调用命令，不实现任何判定；随机示例、AI 面板都不影响 `check_text` 的结果。门禁仍是 `tools/parity` 的逐键比对（v1.8：593 例，RULE_VERSION=yyb-4）。
 
-### 5.8 对外 HTTP 接口 yyb-api（v1.9）
+### 5.8 对外 HTTP 接口 yyb-api（v1.10）
 
 同一个 Cargo 包的第三个可执行文件，给**外部程序**调用：`src-tauri/src/bin/yyb_api.rs` + `src-tauri/src/api.rs`（手写 HTTP/1.1，无新依赖）。它不建窗口、不碰 WebView2，可在无桌面会话里跑。
 
@@ -229,9 +229,9 @@ src-tauri\target\release\yyb-api.exe
 | `POST /v1/points` | `{text, templateId, includeRules, maxPoints}` → `points[]`（`source=ai\|rule`）+ `review` + `verdict` |
 
 - 复用关系：规则判定仍走 `core_ffi::check`；模型改写走 `ai::revise_points_blocking` → `revise_blocking`，与壳页「AI 修改」同一条链路（同提示词、同守卫、同重试），**没有第二套实现**。
-- 安全：Key 只从环境变量进进程内存；无 token 且未显式 `YYB_API_ALLOW_ANON=1` 时**拒绝启动**；默认只监听 `127.0.0.1:8788`；无请求日志。
+- 安全：Key 只从环境变量进进程内存；无 token 且未显式 `YYB_API_ALLOW_ANON=1` 时**拒绝启动**；默认只允许回环监听（`127.0.0.0/8`、`::1`、`localhost`），对外监听须显式 `YYB_API_ALLOW_REMOTE=1` **且**设 token，否则启动即拒；无请求日志。
 - 边界：明文 HTTP、`connection: close`、需 `Content-Length`（不支持 chunked）、请求体 ≤ 512 KB、正文 ≤ 20,000 码元、默认限流 30 次/分钟（全局单桶）。
-- 完整字段说明、错误码表、请求响应示例、待裁定项：`docs/api.md`。
+- 完整字段说明、错误码表、请求响应示例、已裁定的默认方案（Q-40…Q-45）：`docs/api.md`。
 
 ## 6. 验收
 
