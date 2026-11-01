@@ -1,0 +1,39 @@
+[package]
+name = "yanyibian"
+version = "0.1.0"
+description = "验一遍 · 交付前先验一遍"
+edition = "2021"
+rust-version = "1.77"
+
+[lib]
+name = "yanyibian_lib"
+crate-type = ["rlib"]
+
+[[bin]]
+name = "yanyibian"
+path = "src/main.rs"
+
+[[bin]]
+name = "yyb-check"
+path = "src/bin/yyb_check.rs"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+cc = "1"
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+encoding_rs = "0.8"
+zip = { version = "9", default-features = false, features = ["deflate"] }
+quick-xml = "0.42"
+# native-tls：Windows 上走 schannel，不引入 aws-lc（后者需要 NASM，本机没装）
+reqwest = { version = "0.13", default-features = false, features = ["blocking", "json", "native-tls"] }
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+strip = true

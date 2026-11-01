@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>验一遍 · 判定内核</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="bar">
+  <strong>验一遍 · 判定内核</strong>
+  <span class="ver">规则版本 <b id="rule-version">—</b></span>
+  <span class="ver">本地校验 · 不联网</span>
+</header>
+
+<main>
+  <p class="lede">这是仓库自带的最小壳页，用于验证 <code>C++ 内核 → C ABI → Tauri 命令</code> 整条链路；完整界面不在本仓库。</p>
+
+  <section class="row" aria-label="模板">
+    <span class="label">模板</span>
+    <div id="templates" class="chips"></div>
+  </section>
+
+  <section class="pane">
+    <div class="pane-head">
+      <h2>要交付的文本</h2>
+      <div class="actions">
+        <button id="btn-open" class="btn">打开文件…</button>
+        <button id="btn-sample" class="btn">填入示例</button>
+        <button id="btn-check" class="btn btn-primary">查一遍</button>
+      </div>
+    </div>
+    <textarea id="text" spellcheck="false" placeholder="把要交付的文本粘进来，选模板，点“查一遍”。Ctrl+Enter 也可以。"></textarea>
+    <p class="stat"><span id="stat-chars">0 字</span> · <span id="stat-enc">—</span> · <span id="stat-cap"></span></p>
+    <p id="hint" class="hint" role="status" aria-live="polite"></p>
+  </section>
+
+  <section class="pane" aria-live="polite">
+    <div class="pane-head"><h2>结论</h2></div>
+    <div id="verdict" class="verdict"><b id="verdict-text">—</b><span id="verdict-why"></span></div>
+    <ul id="defects" class="list"></ul>
+    <h3>已通过</h3>
+    <ul id="passes" class="list pass"></ul>
+  </section>
+</main>
+
+<footer><span id="foot-note">最小壳页 · 完整功能请用 CLI 或集成调用</span></footer>
+<script src="app.js"></script>
+</body>
+</html>

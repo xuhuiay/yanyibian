@@ -1,116 +1,35 @@
-# 验一遍 YanYiBian
+# 验一遍 · 后端（判定内核 + Tauri 壳）
 
-**AI 产出的交付前自检** —— 把要交出去的周报、通知、项目说明贴进来，按模板逐条比对格式、要素覆盖、长度、语气、禁用套话和事实一致性，把有问题的地方直接标在原文上。
+本仓库只存放「验一遍」的**后端程序**：C++17 判定内核 + Tauri 2 壳 + 命令层 + 差分门禁。
+面向用户的完整界面不在本仓库；仓库只带一个**最小壳页** `shell/`，用于验证「C++ 内核 → C ABI → Tauri 命令」整条链路。
 
-纯前端实验：**没有后端、没有数据库、不发起任何网络请求**，规则全部在浏览器里执行，文字不离开本机。同样的文本每次结论一致，也能说清是哪一条规则没满足。
+> 站点/前端内容已移出本仓库（历史仍保留在 Git 中，本地备份见 `_backup/`）。
 
-本仓库是「汐星札记」站点的一份独立副本，在其中并入了「验一遍」这个实验页，作为该项目的 GitHub 定向入口。
-
----
-
-## 一、这个页面在做什么
-
-校验的输入是「一段文本 + 一个模板」，输出是「结论 + 缺陷列表 + 一句解释」：
+## 结构
 
 ```
-(文本, 约束) -> (结论, 缺陷列表, 解释)
+core/        C++17 判定内核（唯一实现）+ yyb-cli（表驱动门禁）
+src-tauri/   Tauri 2 壳：commands / core_ffi / text_io / docx / limits / ai
+shell/       最小壳页（index.html + app.js + style.css，零框架、零打包器）
+tools/       parity 差分门禁（含规格副本 spec/yanyibian.js）、ai-mock、图标生成
+scripts/     build-windows / build-bundle / test-windows / verify-all
+docs/        build-and-run / parity / ai-api-rules
 ```
 
-结论只有三档：
+## 构建
 
-| 结论 | 触发条件 |
-| --- | --- |
-| 可以交付 | 没有高/中优先缺陷 |
-| 建议改一遍再交 | 存在中优先缺陷 |
-| 不建议直接交付 | 存在高优先缺陷 |
-
-### 六类约束
-
-| 类别 | 检查什么 | 举例 |
-| --- | --- | --- |
-| 格式 | 段落数、结构是否成形 | 周报至少要 2 段 |
-| 要素覆盖 | 模板要求的关键要素是否出现 | 周报缺「风险」、通知缺「地点」 |
-| 长度 | 是否超出模板字数上限 | 通知超过 200 字，超出部分被标出 |
-| 语气 | 感叹号数量、绝对化措辞 | 「一定能」「百分之百」「彻底解决」 |
-| 禁用项 | 模板的套话黑名单 | 「赋能」「闭环」「抓手」「生态位」 |
-| 事实一致性 | 无量化的断言是否缺少出处 | 「提升 40%」「增长 3 倍」提醒补来源 |
-
-### 内置模板
-
-| 模板 | 字数上限 | 必需要素 |
-| --- | --- | --- |
-| 周报 | 300 | 进度 / 计划 / 风险 |
-| 通知 | 200 | 时间 / 地点 / 对象 / 要求 |
-| 项目说明 | 500 | 背景 / 目标 / 用法 / 限制 |
-| 通用长文 | 600 | — |
-
-侧栏另有 3 条示例文本（缺风险的周报、缺地点的通知、套话超长的长文），点一下就能直接看到标红效果。
-
----
-
-## 二、页面结构
-
-```
-验一遍/
-├─ index.html          主站首页（已并入「验一遍」产品卡，第 04 个实验）
-├─ yanyibian.html      ★ 验一遍实验页
-├─ yanyibian.css       ★ 本页样式（datawave.css 的骨架 + 本页新增的校验/结果样式）
-├─ yanyibian.js        ★ 规则引擎与渲染（约 450 行，纯浏览器端）
-├─ theme.css           站点主题变量与亮/暗色覆盖（必须在页面 CSS 之后加载）
-├─ theme.js            亮暗主题切换
-├─ datawave.html/.css/.js    澜图 DataWave 实验（原站已有）
-├─ starflow.html/.css/.js    星潮 StarFlow 实验（原站已有）
-├─ sheentalk.html/.css/.js   汐言 SheenTalk 实验（原站已有）
-├─ note-*.html, notes.css    笔记页
-├─ style.css, main.js        首页样式与交互
-├─ liquid.css                少量液态玻璃效果
-└─ favicon.ico, og-image.jpg, feed.xml, robots.txt, sitemap.xml
+```bat
+scripts\build-windows.bat        :: 需 MSVC（vcvars64）+ cargo
+scripts\build-bundle.bat         :: 打 NSIS 安装包，需 Tauri CLI 2.x
 ```
 
-★ 为本仓库新增的三个文件，其余为「汐星札记」原站文件，未做改动（仅 `index.html` 增加了一张产品卡并把「三个实验」改为「四个实验」）。
+## 验收
 
-### yanyibian.js 内部结构
-
-- `TEMPLATES`：四套模板的约束定义（字数上限、最少段落数、必需要素、套话黑名单、感叹号上限）
-- `SAMPLES`：三条示例文本
-- `check(text, tpl)`：跑六类检测，返回缺陷数组（每条含 `type / severity / start / end / excerpt / message`）
-- `highlight()`：按位置把缺陷片段包成 `<mark class="hl">`，缺要素这类「没有原句可标」的缺陷只在清单里说明
-- `verdictOf()`：按最高严重度给出三档结论
-- `render()`：输出结论条、三个指标卡（字数/上限、缺陷数、通过项）、左右两栏（标注原文 / 缺陷清单与通过项）
-
----
-
-## 三、本地预览方式
-
-**方式一：直接打开**
-双击 `yanyibian.html`，或在浏览器地址栏输入文件路径（`file:///.../验一遍/yanyibian.html`）。页面不依赖任何接口，直接打开即可使用。
-
-**方式二：起一个本地静态服务**（推荐，路径行为与线上一致）
-
-```bash
-cd 验一遍
-python -m http.server 8000
-# 打开 http://localhost:8000/yanyibian.html
+```bat
+scripts\verify-all.bat           :: 期望末行 ALL CHECKS PASSED，且 parity 493/493
+scripts\test-windows.bat ai::    :: 3 个守卫单测
 ```
 
-```bash
-# 或者用 Node
-npx serve .
-```
+判定口径与一致性机制见 `docs/parity.md`；构建/运行/打包细节见 `docs/build-and-run.md`。
 
-两种方式都不需要安装依赖、不需要登录。字体（Noto Sans SC / Noto Serif SC / Space Grotesk）来自 Google Fonts，断网时会回退到系统字体，功能不受影响。
-
----
-
-## 四、边界与说明
-
-- 这是**实验性演示**：规则是固定写死的，判断的是「有没有满足这套模板的约束」，不做语义理解，也不判断内容真假。
-- 不做的事：不训练模型、不调用大模型 API、不保存文本、不做用户系统。
-- 标红位置依赖原文的字符偏移，所以修改文本后要重新点一次「开始校验」。
-- 规则可直接改：`yanyibian.js` 顶部的 `TEMPLATES` 就是全部约束，改完刷新页面即生效。
-
-## 五、相关
-
-- 仓库：https://github.com/xuhuiay/yanyibian
-- 站点：汐星札记（sheenova.cn）
-- 项目：验一遍 —— 面向 AI 生成内容的约束校验与缺陷定位工具
+**规则版本**：`yyb-2`（改规则须同时改 C++ 与 `tools/parity/spec/yanyibian.js` 并递增）。

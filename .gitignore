@@ -1,0 +1,19 @@
+# build outputs
+/src-tauri/target/
+/src-tauri/gen/schemas/
+/core/build/
+/build/
+*.exe
+*.obj
+*.pdb
+*.ilk
+*.lib
+*.dll
+*.exp
+*.log
+*.tmp
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
