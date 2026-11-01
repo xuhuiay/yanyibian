@@ -111,5 +111,6 @@ npx serve .
 
 ## 五、相关
 
+- 仓库：https://github.com/xuhuiay/yanyibian
 - 站点：汐星札记（sheenova.cn）
 - 项目：验一遍 —— 面向 AI 生成内容的约束校验与缺陷定位工具
