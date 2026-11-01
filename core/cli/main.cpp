@@ -1,8 +1,8 @@
 /* yyb-cli —— 内核的命令行形态（方案 §2.3 的"测试形态"）
    用法：
      yyb-cli --version               打印规则版本
-     yyb-cli --templates             打印四套模板约束 JSON
-     yyb-cli --samples               打印三条示例 JSON
+     yyb-cli --templates             打印五套模板约束 JSON
+     yyb-cli --samples               打印四条示例 JSON
      yyb-cli <tpl> <text-file>       校验一个文本文件（UTF-8）
      yyb-cli --tab <file.tab>        逐行校验；每行 "模板ID<TAB>UTF-16LE十六进制"
    退出码：0 成功；2 用法错误；3 文件读取失败；4 未知模板。 */

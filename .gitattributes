@@ -4,3 +4,5 @@
 *.png binary
 *.ico binary
 *.jpg binary
+# 门禁语料按字节比对，禁止行尾归一化（否则 LF/CRLF 会改变区间下标）
+tools/parity/fixtures/** -text

@@ -22,13 +22,13 @@ char* yyb_check_json(const char* text_utf8, const char* template_id);
 /* 同上，但文本按长度传入（允许内含 NUL，Rust 侧用这个）。 */
 char* yyb_check_json_n(const char* text_utf8, size_t text_len, const char* template_id);
 
-/* 四套模板的约束定义 → JSON 数组 */
+/* 五套模板的约束定义 → JSON 数组 */
 char* yyb_list_templates_json(void);
 
-/* 三条示例文本 → JSON 数组 */
+/* 四条示例文本 → JSON 数组 */
 char* yyb_list_samples_json(void);
 
-/* 规则版本号，例如 "yyb-2"（静态字符串，不要释放） */
+/* 规则版本号，例如 "yyb-3"（静态字符串，不要释放） */
 const char* yyb_rule_version(void);
 
 /* 释放内核返回的字符串 */

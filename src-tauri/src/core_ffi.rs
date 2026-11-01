@@ -21,7 +21,7 @@ fn take(p: *mut c_char) -> Option<String> {
     Some(s)
 }
 
-/// 规则版本号，例如 "yyb-2"。前端展示、CI 校验、报告落款都用它。
+/// 规则版本号，例如 "yyb-3"。前端展示、CI 校验、报告落款都用它。
 pub fn rule_version() -> String {
     unsafe { CStr::from_ptr(yyb_rule_version()) }
         .to_string_lossy()

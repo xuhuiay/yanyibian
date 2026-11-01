@@ -30,6 +30,11 @@ set "EXE=src-tauri\target\release\yyb-check.exe"
 if errorlevel 1 exit /b 1
 "%EXE%" weekly "tools\parity\fixtures\smoke-weekly.txt"
 if errorlevel 1 exit /b 1
+rem v1.7: the 5th template (agentcmd) must also answer end-to-end through Rust -> C ABI -> C++
+"%EXE%" agentcmd "tools\parity\fixtures\agentcmd-ok.txt"
+if errorlevel 1 exit /b 1
+"%EXE%" agentcmd "tools\parity\fixtures\agentcmd-missing-boundary.txt"
+if errorlevel 1 exit /b 1
 echo.
 echo ALL CHECKS PASSED
 exit /b 0

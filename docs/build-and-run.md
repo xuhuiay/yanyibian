@@ -6,7 +6,7 @@
 ## 1. 这是什么
 
 `yanyibian-app` 是「验一遍」的独立桌面客户端：**C++17 规则内核（静态库，同进程）+ Tauri 2 壳 + 零框架静态前端**。
-判定只有一份实现，且与 Web 端 `tools/parity/spec/yanyibian.js` **逐键等价**（由 493 例差分门禁强制）。
+判定只有一份实现，且与 Web 端 `tools/parity/spec/yanyibian.js` **逐键等价**（由 538 例差分门禁强制）。
 
 版本说明：程序版本仍是 **0.1.0**（安装包名不变）；v1.4 在同一版本号下加了「单份上限收紧到 20000 码元」与「可选外部 AI 通道（代号 v0.2）」。
 
@@ -35,7 +35,7 @@ yanyibian-app/
 │  ├─ include/yyb/yyb.h        对外 C ABI（唯一头文件）
 │  ├─ src/yyb_text.{h,cpp}     UTF-8 ⇄ UTF-16 码元、空白判定（与 JS \s 同集）
 │  ├─ src/yyb_pattern.{h,cpp}  MiniRE：按码元匹配的 ECMAScript 子集正则
-│  ├─ src/yyb_templates.cpp    4 套模板 + 3 条示例（逐字段照 yanyibian.js）
+│  ├─ src/yyb_templates.cpp    5 套模板 + 4 条示例（逐字段照 yanyibian.js）
 │  ├─ src/yyb_engine.cpp       六类检查 / 结论 / 排序 / 区间
 │  ├─ src/yyb_capi.cpp         C ABI 实现 + 固定键序 JSON 序列化
 │  ├─ cli/main.cpp             yyb-cli：控制台门禁入口（支持 --tab 十六进制通道）
@@ -57,7 +57,7 @@ yanyibian-app/
 │  ├─ styles.css               纸面墨色主题（系统字体栈，零外联）
 │  └─ app.js                   invoke 调用、渲染、标红、导出报告
 ├─ tools/
-│  ├─ parity/gen-corpus.mjs    生成 493 例语料（固定种子 20261101）
+│  ├─ parity/gen-corpus.mjs    生成 538 例语料（固定种子 20261101）
 │  ├─ parity/gen-golden.mjs    用 JS 真源算期望值 → build/golden.jsonl
 │  ├─ parity/rulemeta.mjs      导出 RULE_VERSION → build/rulemeta.json
 │  ├─ parity/run-parity.mjs    逐键 deepEqual，先校验版本戳
@@ -210,9 +210,9 @@ scripts\verify-all.bat
 | 步骤 | 内容 | 通过标志 |
 |---|---|---|
 | 1/4 | `rulemeta.mjs` + `gen-corpus.mjs` | 生成 `build/corpus.jsonl` 与 `build/rulemeta.json` |
-| 2/4 | `build-cli.bat` + `gen-golden.mjs` + `run-parity.mjs` | `[parity] PASS 493/493 一致（RULE_VERSION=yyb-2）` |
+| 2/4 | `build-cli.bat` + `gen-golden.mjs` + `run-parity.mjs` | `[parity] PASS 538/538 一致（RULE_VERSION=yyb-3）` |
 | 3/4 | `build-windows.bat` | 两个 exe 落地 |
-| 4/4 | `yyb-check --version` + `yyb-check weekly tools\parity\fixtures\smoke-weekly.txt` | 版本 `yyb-2`；`chars 78` / `defects 3` / `passes 5` |
+| 4/4 | `yyb-check --version` + `yyb-check weekly tools\parity\fixtures\smoke-weekly.txt` | 版本 `yyb-3`；`chars 78` / `defects 3` / `passes 5` |
 
 末行出现 `ALL CHECKS PASSED` 即全绿。
 
@@ -220,7 +220,7 @@ scripts\verify-all.bat
 
 | 项 | 结果 |
 |---|---|
-| 差分门禁 | `PASS 493/493`（`RULE_VERSION=yyb-2`）——v1.3 加入 docx 后复跑仍全绿 |
+| 差分门禁 | `PASS 538/538`（`RULE_VERSION=yyb-3`） |
 | 构建 | 首次 1m 06s；改源码后 1m 18s；无改动 0.36s。**v1.4**：`yanyibian.exe` **7,714,304 B**（加 reqwest/native-tls 共 +914 KB）、`yyb-check.exe` 691,200 B；v1.3 为 6,800,384 B |
 | FFI 冒烟 | `yyb-check weekly tools\parity\fixtures\smoke-weekly.txt` → 3 条缺陷（缺「风险」/ 套话「赋能」/ 量化断言 2 处）、5 项通过 |
 | GUI 实测 | 通过 WebView2 远程调试（CDP）驱动真实窗口，结论「不建议直接交付」、缺陷 3 条、通过项 5 条，与 CLI/JS 逐字一致 |
@@ -286,7 +286,7 @@ start "" "%LOCALAPPDATA%\YanYiBian\yanyibian.exe"
 
 | 层 | 内容 |
 |---|---|
-| 内核 | 六类检查（长度/要素覆盖/禁用项/语气/格式/事实一致性）、三档结论、缺陷稳定排序 + 解释、定位区间去重叠、通过项、4 套模板、3 条示例；空文本（含纯空白）判单条 `high`「全文为空」（`type=格式`，`start=-1`）并跳过其余检查；前端不前置拦截，照常展示内核结论 |
+| 内核 | 六类检查（长度/要素覆盖/禁用项/语气/格式/事实一致性）、三档结论、缺陷稳定排序 + 解释、定位区间去重叠、通过项、5 套模板、4 条示例；空文本（含纯空白）判单条 `high`「全文为空」（`type=格式`，`start=-1`）并跳过其余检查；前端不前置拦截，照常展示内核结论 |
 | C ABI | `yyb_check_json_n` / `yyb_list_templates_json` / `yyb_list_samples_json` / `yyb_rule_version` / `yyb_free` |
 | Rust 命令 | `api_version` / `list_templates` / `list_samples` / `check_text` / `load_text_file` / `check_files` / `pick_text_files` / `save_report` |
 | 文件解码 | UTF-16LE/BE BOM → 严格 UTF-8 → GB18030，统一去 BOM；`.docx` 走 `docx.rs` 抽正文（§5.4）；`.pdf/.doc` 仍返回 `E_UNSUPPORTED_FORMAT` |
@@ -380,7 +380,7 @@ scripts\verify-all.bat
 
 | 判据 | 期望 |
 |---|---|
-| 差分门禁 | `[parity] PASS 493/493 一致（RULE_VERSION=yyb-2）` |
+| 差分门禁 | `[parity] PASS 538/538 一致（RULE_VERSION=yyb-3）` |
 | 冒烟 | `yyb-check weekly tools\parity\fixtures\smoke-weekly.txt` → `chars 78`、`defects 3`、`passes 5` |
 | 收尾 | `ALL CHECKS PASSED` |
 | 单测（可选但建议） | `scripts\test-windows.bat ai::` → `3 passed` |
@@ -462,7 +462,7 @@ git push -u origin （待补充：分支名）
 ## 附：v1.7 目录迁移说明（2026-11-01）
 
 - 本仓库已从「桌面端 + 零框架前端 `ui/`」改为**仅后端程序**：`ui/` 整体移除，改为最小壳页 `shell/`（`index.html` + `app.js` + `style.css`，可试校验，不是产品级界面）。
-- 规格真源改为仓库内副本 `tools/parity/spec/yanyibian.js`（原跨仓库路径 `../验一遍/yanyibian.js` 已废弃）；`RULE_VERSION` 仍为 `yyb-2`。
+- 规格真源改为仓库内副本 `tools/parity/spec/yanyibian.js`（原跨仓库路径 `../验一遍/yanyibian.js` 已废弃）；`RULE_VERSION` 当时为 `yyb-2`（v1.7 起为 `yyb-3`）。
 - 冒烟样本文档路径改为 `tools/parity/fixtures/smoke-weekly.txt`（原 `build/smoke-weekly.txt`，`build/` 已进 `.gitignore`）。
 - 文中出现的 `<仓库根>`、`（待补充：…）` 是替换后的占位；绝对路径已全部去除。
 - 文档中带行号的 `shell/*` 引用沿用 v1.6 的旧行号，v1.7 的壳页代码更短，行号可能偏移；判定逻辑不受影响。

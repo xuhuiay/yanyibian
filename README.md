@@ -22,13 +22,13 @@
 ## 特性
 
 - **7 项机械检查 + 1 个前置**：长度、要素覆盖、套话、感叹号、绝对化表述、段落、量化断言；空文本单列 high 并短路。
-- **4 套模板**（判定阈值即规则）：周报 300 字 / 通知 200 字 / 项目说明 500 字 / 通用 600 字，各自带必需要素与禁用词表。
+- **5 套模板**（判定阈值即规则）：周报 300 字 / 通知 200 字 / 项目说明 500 字 / 通用 600 字 / Agent 命令验收 1200 字，各自带必需要素与禁用词表。
 - **三档结论**：不建议直接交付（有 high）/ 建议改一遍再交（有 mid）/ 可以交付；同时返回"已通过哪几条"。
 - **能定位就定位**：缺陷带原文区间，可在界面里直接选中对应句子。
 - **中文文件读得进来**：`.txt` / `.md` / `.docx`，编码自动识别（UTF-16 BOM → 严格 UTF-8 → GB18030）。
 - **单份 20,000 字、批量 200 份**；单文件 8 MB、批量 200 MB，超限给可读错误码。
 - **可选 AI 修改通道**：用户自带 API Key、默认关闭、关闭时零外联；改动经本地守卫（默认不许改数字）、改完重新校验；结果不计入结论。
-- **判定只有一处实现**：C++17 内核 + Web 端规格副本，**493 条语料逐键 deep-equal** 门禁，规则改动须同步两处并递增 `RULE_VERSION`（当前 `yyb-2`）。
+- **判定只有一处实现**：C++17 内核 + Web 端规格副本，**538 条语料逐键 deep-equal** 门禁，规则改动须同步两处并递增 `RULE_VERSION`（当前 `yyb-3`）。
 
 完整介绍（检查项口径、模板阈值、13 个命令、读入层、边界与已知限制）见 **[docs/introduction.md](docs/introduction.md)**。
 
@@ -56,11 +56,11 @@ scripts\build-bundle.bat
 ## 验收（改判定逻辑前后都要跑）
 
 ```bat
-scripts\verify-all.bat           :: 期望末行 ALL CHECKS PASSED，且 parity 493/493
+scripts\verify-all.bat           :: 期望末行 ALL CHECKS PASSED，且 parity 538/538
 scripts\test-windows.bat ai::    :: 3 个守卫单测
 ```
 
-**一致性门禁**：`tools/parity` 用固定种子生成 493 条语料（四模板示例、8 种空白形态、长度边界、要素正则扫描、禁用词/感叹号/段落/量化短语、代理对/BOM/零宽/U+2028、220 条随机文本），逐键比对 C++ 内核与 `tools/parity/spec/yanyibian.js`（Web 端规格副本），要求 100% 全绿。不一致时打印首个差异路径与两端值。
+**一致性门禁**：`tools/parity` 用固定种子生成 538 条语料（五模板示例、8 种空白形态、长度边界、要素正则扫描、禁用词/感叹号/段落/量化短语、代理对/BOM/零宽/U+2028、220 条随机文本），逐键比对 C++ 内核与 `tools/parity/spec/yanyibian.js`（Web 端规格副本），要求 100% 全绿。不一致时打印首个差异路径与两端值。
 
 ## 结构
 
@@ -80,7 +80,7 @@ src-tauri/   Tauri 2 壳
 shell/       最小壳页（index.html + app.js + style.css，零框架、零打包器）
 tools/       parity 差分门禁（含 spec/yanyibian.js）、ai-mock、图标生成
 scripts/     build-windows / build-bundle / test-windows / verify-all
-docs/        introduction / build-and-run / parity / ai-api-rules
+docs/        introduction / template-agent-command / build-and-run / parity / ai-api-rules
 ```
 
 ## 文档
@@ -89,7 +89,8 @@ docs/        introduction / build-and-run / parity / ai-api-rules
 |---|---|
 | [docs/introduction.md](docs/introduction.md) | 程序介绍：定位、检查项、模板、结论、用法、读入层、边界、示例、已知限制 |
 | [docs/build-and-run.md](docs/build-and-run.md) | 构建、运行、打包、安装、排障、更新发布清单 |
-| [docs/parity.md](docs/parity.md) | 判定口径逐条实现细节与 493 例门禁 |
+| [docs/parity.md](docs/parity.md) | 判定口径逐条实现细节与 538 例门禁 |
+| [docs/template-agent-command.md](docs/template-agent-command.md) | 第 5 套模板 `agentcmd`（Agent 命令验收）：五区块骨架、判定映射、范例、实施清单 |
 | [docs/ai-api-rules.md](docs/ai-api-rules.md) | AI 通道的权限范围、鉴权、配额、错误码、隐私 |
 
 ## 关于本仓库
@@ -97,8 +98,8 @@ docs/        introduction / build-and-run / parity / ai-api-rules
 - **范围**：只有后端与最小壳页。站点/前端内容已移出（历史保留在 Git 中，本地备份见 `_backup/`）。
 - **平台**：Windows 10 1809+ / Windows 11 x64（NSIS 安装包，`currentUser` 模式，免管理员）；移动端待定。
 - **第三方**：C++ 侧零第三方依赖（自研 MiniRE 正则子集）；Rust 侧 tauri 2 / quick-xml / zip / encoding_rs / reqwest（仅 AI 通道）。
-- **规则版本**：`yyb-2`。改规则必须同时改 C++ 内核与 `tools/parity/spec/yanyibian.js`，递增版本号，并让 493 例全绿。
+- **规则版本**：`yyb-3`。改规则必须同时改 C++ 内核与 `tools/parity/spec/yanyibian.js`，递增版本号，并让 538 例全绿。
 
 ---
 
-**规则版本** `yyb-2` · 判定内核 C++17（`core/`） · 外壳 Tauri 2（`src-tauri/`）
+**规则版本** `yyb-3` · 判定内核 C++17（`core/`） · 外壳 Tauri 2（`src-tauri/`）

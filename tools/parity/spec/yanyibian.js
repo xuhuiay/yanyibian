@@ -15,8 +15,8 @@
 
    对外接口（UMD：浏览器挂 window.YanYiBian，Node/打包器走 module.exports）：
 
-     YanYiBian.TEMPLATES          四套模板的约束定义
-     YanYiBian.SAMPLES            三条示例文本（自测与演示用）
+     YanYiBian.TEMPLATES          五套模板的约束定义
+     YanYiBian.SAMPLES            四条示例文本（自测与演示用）
      YanYiBian.SEV_LABEL          严重度中文名
      YanYiBian.check(text, tpl)   → { defects, passes, chars, requiredHit }
      YanYiBian.verdictOf(defects) → { cls, text, why, high, mid, low }
@@ -98,6 +98,22 @@
       required: [],
       banned: ["赋能", "闭环", "抓手", "生态位", "全面提升", "颠覆", "革命性"],
       maxExclaim: 1
+    },
+    agentcmd: {
+      label: "Agent 命令验收",
+      short: "角色 / 背景 / 步骤 / 约束 / 验收",
+      desc: "验收一段交给 Agent 执行的命令：角色、背景、步骤、约束与边界、验收标准五个区块缺一不可。上限 1200 字。",
+      maxChars: 1200,
+      minParas: 5,
+      required: [
+        { name: "角色", re: /(角色|身份|你是|作为|担任)/ },
+        { name: "背景", re: /(背景|上下文|现状|起因|为什么|目前)/ },
+        { name: "步骤", re: /(步骤|流程|第[一二三四五六七八九十0-9]步|依次|逐个)/ },
+        { name: "约束与边界", re: /(约束|边界|禁止|不得|不要|只允许|上限|范围|白名单|黑名单)/ },
+        { name: "验收标准", re: /(验收|通过标准|判定标准|完成标准|自检|必须满足|检查项)/ }
+      ],
+      banned: ["尽量", "大概", "差不多", "酌情", "适当", "看情况", "有时间", "应该没问题"],
+      maxExclaim: 0
     }
   };
 
@@ -118,6 +134,11 @@
       tpl: "general",
       title: "通用 · 套话与超长",
       text: "本项目致力于打造一体化解决方案，通过闭环设计全面赋能团队协作，是本领域唯一选择。\n我们相信这套抓手能够彻底解决沟通成本问题，让每个人都能百分之百专注在真正重要的事情上，从而在整体效率上取得前所未有的突破！！！"
+    },
+    {
+      tpl: "agentcmd",
+      title: "命令验收 · 缺约束与边界",
+      text: "角色：你是发布工程师，负责把 0.2.0 发到测试环境。\n背景：上一版发布漏了迁移脚本，回滚过一次。\n步骤：第一步先跑全量测试，第二步构建产物，第三步部署并按步骤尽量核对结果。\n验收标准：测试全绿、部署后接口返回 200。"
     }
   ];
 
@@ -125,7 +146,8 @@
   var SEV_LABEL = { high: "高优先", mid: "中优先", low: "低优先" };
 
   // yyb-2：空文本判 high（原实现会给出"可以交付"，与"没有正文"的直觉冲突）
-  var RULE_VERSION = "yyb-2";
+  // yyb-3：新增第 5 套模板 agentcmd（Agent 命令验收，五区块）——只加模板，不改既有 4 套的判定
+  var RULE_VERSION = "yyb-3";
 
   /* ---------------- 3. 工具（无副作用） ---------------- */
 
